@@ -61,7 +61,7 @@ That's all you need to know about WezTerm keybinds. Everything else lives in tmu
 - Official docs: <https://wezterm.org/> (short, well-organized)
 - Config reference: <https://wezterm.org/config/files.html>
 - Every option: <https://wezterm.org/config/lua/config/index.html>
-- ThePrimeagen intro: <https://www.youtube.com/watch?v=TTgQV21X0SQ>
-- Josean Martinez walk-through: <https://www.youtube.com/watch?v=ibCP0mHp0TA>
+- **[Josean Martinez — How I Use Wezterm & Zsh For An Amazing Terminal Setup On My Mac](https://www.youtube.com/watch?v=TTgQV21X0SQ)** — concrete config walkthrough
+- See `docs/RESOURCES.md` for the full index
 
 Kun's rationale for WezTerm-over-Alacritty/kitty: cross-platform, actively maintained, native Lua config, great macOS integration. He doesn't customize it much — tmux does the work.

@@ -112,15 +112,18 @@ Inside neogit: `s` to stage, `u` to unstage, `x` to discard, `cc` to commit, `?`
 
 **Best resources for you specifically** (since you don't have prior Neovim config):
 
-1. **[ThePrimeagen — Neovim as your editor](https://www.youtube.com/watch?v=w7i4amO_zaE)** — 12 min, no-nonsense
-2. **[TJ DeVries — Kickstart.nvim walkthrough](https://www.youtube.com/watch?v=stqUbv-5u2s)** — the author of neovim.io walks through a from-scratch config
-3. **[Josean Martinez — full custom Neovim setup](https://www.youtube.com/watch?v=vdn_pKJUda8)** — 1hr, covers plugin management + LSP
-4. **[Neovim docs on lua config](https://neovim.io/doc/user/lua-guide.html)** — official, dense but authoritative
+1. **[Luke Smith — Vimtutor Let's Play](https://www.youtube.com/watch?v=d8XtNXutVto)** — do this alongside `vimtutor`
+2. **[ThePrimeagen — 0 to LSP: Neovim RC From Scratch](https://www.youtube.com/watch?v=w7i4amO_zaE)** — build a config from nothing
+3. **[TJ DeVries — Effective Neovim: Instant IDE](https://www.youtube.com/watch?v=stqUbv-5u2s)** — kickstart.nvim walkthrough from a Neovim core maintainer
+4. **[Josean Martinez — How I Setup Neovim On My Mac](https://www.youtube.com/watch?v=vdn_pKJUda8)** — 1hr full setup with LSP
+5. **[Neovim Lua guide](https://neovim.io/doc/user/lua-guide.html)** — official, dense but authoritative
+
+See `docs/RESOURCES.md` for the full index.
 
 ## Learning path (4 hours to competent)
 
 1. **30 min** — run `vimtutor` end to end. Do not skip.
-2. **20 min** — ThePrimeagen video above
+2. **~1 hour** — ThePrimeagen "0 to LSP" video above
 3. **1 hour** — open your own project in nvim, use `<space>ff` to jump around, `<space>fg` to grep. Force yourself.
 4. **30 min** — try oil.nvim: press `-`, navigate to a random directory, rename a file by editing the buffer, `:w`
 5. **30 min** — try neogit: `<space>gg` inside a repo, stage/commit a change

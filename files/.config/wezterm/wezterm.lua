@@ -7,7 +7,17 @@ local is_macos = wezterm.target_triple:lower():find("darwin") ~= nil
 
 config.color_scheme = "rose-pine-moon"
 config.max_fps = 120
-config.font = wezterm.font("Hack Nerd Font", { weight = "DemiBold" })
+
+-- Font: prefer Hack Nerd Font (used for Kun's setup — installs powerline/nerd
+-- glyphs for tmux status + starship). Falls back to Menlo (built-in on macOS)
+-- if the Nerd variant isn't installed. Ordered list is evaluated left-to-right.
+config.font = wezterm.font_with_fallback({
+  { family = "Hack Nerd Font", weight = "DemiBold" },
+  { family = "Menlo" },
+})
+-- Suppress the "font variant not installed" nag when only the regular Menlo
+-- weight resolves. The frameless setup has no visible bold anyway.
+config.warn_about_missing_glyphs = false
 
 -- Frameless single-window mode (Kun-style):
 -- No title bar, no tab bar, no status line. tmux is the load-bearing session
@@ -24,7 +34,10 @@ config.window_padding = {
   bottom = 0,
 }
 config.window_frame = {
-  font = wezterm.font("Hack Nerd Font", { weight = "Bold" }),
+  font = wezterm.font_with_fallback({
+    { family = "Hack Nerd Font", weight = "Bold" },
+    { family = "Menlo", weight = "Bold" },
+  }),
 }
 config.inactive_pane_hsb = {
   saturation = 0.0,

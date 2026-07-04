@@ -178,9 +178,9 @@ Here's what a typical Kun-style day looks like:
 
 **Agent-native workflow (broader field):**
 
-- **[Simon Willison — LLM CLI](https://simonwillison.net/)** — pioneered many "agent as CLI user" patterns
-- **[Ampcode blog](https://ampcode.com/blog)** — good perspective from another agent harness
-- **[Every.to — How I Use Claude Code](https://every.to/thesis/how-i-use-claude-code)** — practitioner walkthrough
+- **[Simon Willison's blog](https://simonwillison.net/)** — pioneered many "agent as CLI user" patterns; ongoing running commentary on LLM tooling
+- **[Ampcode blog](https://ampcode.com/blog)** — perspective from another agent harness
+- **[Anthropic — Mastering Claude Code in 30 minutes](https://www.youtube.com/watch?v=6eBSHbLKuN0)** — the Claude Code team's own primer
 
 ## Rules of thumb from Kun
 

@@ -94,13 +94,14 @@ Pin this: <https://tmuxcheatsheet.com/>
 ## Learn more
 
 - Official man page: `man tmux` (the definitive reference)
-- ThePrimeagen tmux (best 20 min primer): <https://www.youtube.com/watch?v=DzNmUNvnB04>
-- DevOps Toolbox — "You need to learn tmux RIGHT NOW!!": <https://www.youtube.com/watch?v=Yl7NFenTgIo>
-- Dreams of Code "Tmux has forever changed how I write code" (Kun cites this style): <https://www.youtube.com/watch?v=DzNmUNvnB04>
+- **Dreams of Code — "Tmux has forever changed the way I write code"**: <https://www.youtube.com/watch?v=DzNmUNvnB04>
+- **HackerSploit — Complete tmux Tutorial** (longer, methodical): <https://www.youtube.com/watch?v=Yl7NFenTgIo>
+- **devaslife — dev workflow with tmux and vim**: <https://www.youtube.com/watch?v=sSOfr2MtRU8>
+- See `docs/RESOURCES.md` for the full index
 
 ## Learning path (2 hours total)
 
-1. **20 min** — watch ThePrimeagen video above
+1. **20 min** — watch the Dreams of Code video above
 2. **30 min** — do a real work task inside tmux; force yourself to use only splits/windows, no new terminal tabs
 3. **20 min** — read the "Copy mode" section of the official man page
 4. **kill the tmux server, reboot, re-attach** — see resurrect restore your layout. This is the "oh, that's why" moment
