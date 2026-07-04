@@ -96,12 +96,15 @@ See `docs/LEARN-AGENTIC.md` for the day-to-day workflow.
 
 ---
 
-## 📡 Remote access (Tailscale + mosh)
+## 📡 Remote access (mosh + Tailscale)
 
-Not yet installed on this machine (Tailscale likely needs Security team approval).
-
-- Tailscale docs: <https://tailscale.com/kb/>
-- mosh: <https://mosh.org/>
+- **mosh** — installed (Workbrew-allowlisted). SSH replacement that survives
+  network drops; docs at <https://mosh.org/>.
+- **Tailscale** — **deliberately not installed** on the work Mac. It creates
+  a second encrypted tunnel the corp security stack can't inspect (classic
+  split-tunnel flag), and the productivity win (SSH-from-phone into your
+  Mac) doesn't justify broadening attack surface on a corp device. Install
+  only on personal Macs: `brew install --cask tailscale`.
 
 ---
 

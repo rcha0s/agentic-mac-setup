@@ -123,6 +123,22 @@ You can ignore them for now. If you later decide reproducibility across machines
 - [ ] `claude` in any repo — SessionStart output mentions gh/chrome/tasks ambient context
 - [ ] Reboot: `tmux attach` restores the session (tmux-resurrect)
 
+## Remote access — deliberately skipped
+
+Kun's Layer 4 setup (Tailscale + mosh) enables SSH-from-phone into your
+Mac over a WireGuard mesh. **mosh** is installed. **Tailscale is skipped**
+on this work Mac:
+
+- Tailscale creates a second encrypted tunnel that corporate security
+  can't inspect — classic split-tunnel/exfiltration flag.
+- Would broaden attack surface on the corp Mac for a personal-productivity
+  win, not a work need.
+- Realistic outcome of a Workbrew request: denied.
+
+If you ever move this setup to a personal Mac, install Tailscale via
+`brew install --cask tailscale`, sign in, `tailscale up`, then SSH via the
+device's `*.tail….ts.net` hostname. mosh handles connection drops.
+
 ## Reverting the install
 
 Non-destructive — everything's user-scoped and reversible.
