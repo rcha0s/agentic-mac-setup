@@ -62,4 +62,16 @@ if [ ! -d "$NVM_DIR" ]; then
   nvm install --lts
 fi
 
+echo "Nix + Homebrew + nvm bootstrap complete."
+
+# Install Kun's agentic tooling stack on top of the Nix base.
+# Skip with:  SKIP_AGENTIC=1 bash setup/mac.sh
+if [ "${SKIP_AGENTIC:-0}" != "1" ]; then
+  echo ""
+  echo "Installing agentic tooling stack (skip with SKIP_AGENTIC=1)…"
+  # nvm was just installed above; make node available to agentic.sh right now.
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" || true
+  bash "$DOTFILES_DIR/setup/agentic.sh" || echo "agentic.sh failed; re-run manually: bash $DOTFILES_DIR/setup/agentic.sh"
+fi
+
 echo "Bootstrap complete. Restart your shell if needed, then use 'rebuild' or darwin-rebuild for future config changes."

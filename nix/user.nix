@@ -1,11 +1,11 @@
 { config, pkgs, ... }:
 
 let
-  dotfilesDir = "${config.home.homeDirectory}/github/dotfiles-mac-nix";
+  dotfilesDir = "${config.home.homeDirectory}/github/agentic-mac-setup";
 in
 {
-  home.username = "yourname";
-  home.homeDirectory = "/Users/yourname";
+  home.username = "risawe";
+  home.homeDirectory = "/Users/risawe";
   home.stateVersion = "23.11";
   home.language.base = "en_US.UTF-8";
 
@@ -30,6 +30,11 @@ in
     noto-fonts-cjk-sans
     noto-fonts-color-emoji
     font-awesome
+    # Kun-style workflow additions:
+    tmux            # persistent session backbone (load-bearing)
+    neovim          # editor
+    stow            # symlink management fallback if we ever need it
+    gh              # GitHub CLI (also needed by gh-axi/no-mistakes/firstmate)
   ];
 
   fonts.fontconfig.enable = true;
@@ -44,8 +49,8 @@ in
     signing.format = null;
     settings = {
       user = {
-        name = "Your Name";
-        email = "you@example.com";
+        name = "Rohan Isawe";
+        email = "rohanisawe2@gmail.com";
       };
       core.editor = "vim";
       color.ui = true;
@@ -102,6 +107,16 @@ in
     enable = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
+    initContent = ''
+      bindkey '^f' autosuggest-accept
+
+      # Auto-attach to tmux 'main' session on interactive shell start.
+      # tmux is the load-bearing session primitive in this setup — every shell
+      # lives inside a tmux session so layouts survive terminal restarts.
+      if [[ -o interactive ]] && [[ -z "$TMUX" ]] && [[ -z "$INSIDE_EMACS" ]] && [[ -z "$VSCODE_PID" ]] && command -v tmux >/dev/null 2>&1; then
+        exec tmux new-session -A -s main
+      fi
+    '';
     shellAliases = {
       ".." = "cd ..";
       m = "git switch main";
@@ -114,14 +129,18 @@ in
       reset = "git reset --soft HEAD^";
       rebasem = "git rebase -i main";
       rebasemst = "git rebase -i master";
-      rebuild = "/run/current-system/sw/bin/darwin-rebuild switch --flake ~/github/dotfiles-mac-nix#mac";
+      rebuild = "/run/current-system/sw/bin/darwin-rebuild switch --flake ~/github/agentic-mac-setup#mac";
+      # Agent workflow shortcuts
+      cc = "claude";
+      gnfun = "gnhf";
+      th = "treehouse";
+      nm = "no-mistakes";
     };
-    initContent = ''
-      bindkey '^f' autosuggest-accept
-    '';
   };
 
   home.file = {
     ".config/wezterm".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/files/.config/wezterm";
+    ".config/nvim".source    = config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/files/.config/nvim";
+    ".tmux.conf".source      = config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/files/.tmux.conf";
   };
 }

@@ -1,2 +1,9 @@
 # no-mistakes pipeline evidence should never be committed to this public repo
 .no-mistakes/
+
+# Per-machine personal shell config — the tracked template is
+# files/zshrc.local.example. Copy it to files/zshrc.local locally to fill in
+# JAVA_HOME, cert paths, work AWS profile names, etc. that shouldn't be public.
+files/zshrc.local
+files/bashrc.local
+

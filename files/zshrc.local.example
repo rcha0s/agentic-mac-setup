@@ -1,0 +1,136 @@
+# zshrc.local.example — template for personal zsh customization.
+#
+# Usage on a fresh machine:
+#   cp files/zshrc.local.example files/zshrc.local
+#   # edit files/zshrc.local — add your PATHs, env vars, aliases, functions
+#   # setup/install-noix.sh symlinks files/zshrc.local → ~/.zshrc.local
+#
+# The real ~/.zshrc.local is git-ignored so per-machine personal config
+# (JAVA_HOME paths, cert paths, work AWS profile names, etc.) never leaks
+# into the public repo.
+
+# ============================================================================
+# 1. Personal — edit / add / remove as needed
+# ============================================================================
+
+# ---- Base PATH ------------------------------------------------------------
+# Add anything you install to a non-standard location. Homebrew adds itself
+# via `brew shellenv` below.
+# export PATH="$HOME/.volta/bin:$PATH"                # Volta (if used)
+# export PATH="$HOME/.jenv/bin:$HOME/.jenv/shims:$PATH"  # jenv (if used)
+
+# ---- History --------------------------------------------------------------
+export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=100
+export SAVEHIST=10000
+setopt HIST_IGNORE_DUPS
+setopt SHARE_HISTORY
+
+# ---- Environment ----------------------------------------------------------
+# Enterprise/proxy CA cert (if your org uses one — e.g., ZScaler):
+# export NODE_EXTRA_CA_CERTS="$HOME/Downloads/YourOrgRootCA.pem"
+
+# Language toolchains:
+# export JAVA_HOME=$(/usr/libexec/java_home 2>/dev/null)
+# export GOPATH="$HOME/go"
+# export GOROOT="$(brew --prefix golang 2>/dev/null)/libexec"
+# export WORKON_HOME="$HOME/.virtualenvs"
+
+# ---- Homebrew shellenv ----------------------------------------------------
+[ -x /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
+# Uncomment if your org uses Workbrew:
+# [ -x /opt/workbrew/bin/brew ] && eval "$(/opt/workbrew/bin/brew shellenv)"
+
+# ---- Version managers (uncomment what you use) ----------------------------
+# pyenv
+# if command -v pyenv >/dev/null 2>&1; then
+#   eval "$(pyenv init -)"
+#   command -v pyenv-virtualenv-init >/dev/null 2>&1 && eval "$(pyenv virtualenv-init -)"
+# fi
+
+# jenv (Java version manager)
+# command -v jenv >/dev/null 2>&1 && eval "$(jenv init -)"
+
+# uv-managed env (Astral)
+# [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+
+# ---- Your aliases here ---------------------------------------------------
+# alias ls='ls -aFhlG'
+# alias ll='ls -al'
+# alias c='clear'
+# alias gs='git status'
+# alias gb='git branch -a'
+
+# ---- Your functions here -------------------------------------------------
+
+# Example: open VS Code from CLI, preserving cwd
+# code () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args "$@"; }
+
+# Example: Claude Code wrapper that auto-sources nearest .env — so MCP
+# servers in .mcp.json resolving ${VAR} get their tokens.
+# claude() {
+#   local envfile="${CLAUDE_ENV_FILE:-}"
+#   if [ -z "$envfile" ]; then
+#     local dir="$PWD"
+#     while [ "$dir" != "/" ] && [ -n "$dir" ]; do
+#       if [ -f "$dir/.env" ]; then envfile="$dir/.env"; break; fi
+#       dir="$(dirname "$dir")"
+#     done
+#   fi
+#   if [ -n "$envfile" ] && [ -f "$envfile" ]; then
+#     ( set -a; . "$envfile"; set +a; command claude "$@" )
+#   else
+#     command claude "$@"
+#   fi
+# }
+
+# ============================================================================
+# 2. Kun-style additions (keep these as-is)
+# ============================================================================
+
+# ---- git aliases ---------------------------------------------------------
+alias ..="cd .."
+alias m="git switch main"
+alias mst="git switch master"
+alias pull="git pull"
+alias push="git push"
+alias pushf="git push --force"
+alias add="git add ."
+alias amend="git commit --amend"
+alias reset="git reset --soft HEAD^"
+alias rebasem="git rebase -i main"
+alias rebasemst="git rebase -i master"
+
+# ---- agent workflow shortcuts --------------------------------------------
+alias cc="claude"
+alias gnfun="gnhf"
+alias th="treehouse"
+alias nm="no-mistakes"
+
+# ---- key bindings --------------------------------------------------------
+bindkey '^f' autosuggest-accept 2>/dev/null || true
+
+# ---- zsh plugins (Homebrew) ----------------------------------------------
+# Install once: brew install zsh-autosuggestions zsh-syntax-highlighting
+if [ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+  source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+# syntax-highlighting MUST be sourced last
+if [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+  source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
+
+# ---- starship prompt -----------------------------------------------------
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
+
+# ---- ~/.local/bin (no-mistakes, treehouse install here) ------------------
+export PATH="$HOME/.local/bin:$PATH"
+
+# ---- tmux auto-attach ----------------------------------------------------
+# Kun-style: every interactive shell lives inside tmux `main`.
+# Skip for VS Code integrated terminal and non-interactive shells.
+if [[ -o interactive ]] && [[ -z "$TMUX" ]] && [[ -z "$INSIDE_EMACS" ]] && [[ -z "$VSCODE_PID" ]] && command -v tmux >/dev/null 2>&1; then
+  exec tmux new-session -A -s main
+fi
