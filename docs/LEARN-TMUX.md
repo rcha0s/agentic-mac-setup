@@ -134,36 +134,60 @@ Terminal doesn't scroll normally inside tmux. Enter **copy mode** instead:
 
 Mouse also works (`set -g mouse on` in our config), so you can also just scroll and click-drag.
 
-## Agent status indicators (window-title status pattern)
+## Agent status indicators
 
-If you run Claude Code inside a tmux window, our hook scripts rename the
-window with a status glyph so a glance at the status bar tells you which
-agent is doing what. This is Kun's "green dot when running, done when
-done" pattern from the video.
+If you run Claude Code inside tmux, our hooks surface agent state in two
+places so a glance anywhere on screen tells you what's happening.
 
-| Glyph in window name | Meaning | Status-bar color |
-|---|---|---|
-| `● claude` | agent is running (turn in progress) | green |
-| `✓ claude` | last turn completed | dim gray |
-| `⚠ claude` | Claude needs the human's input | yellow |
-| (no glyph) | plain shell window | default white / bold-cyan when active |
+### Per-pane border (primary, for split-pane workflow)
 
-Driven by three Claude Code hooks in `~/.claude/hooks/`:
-- `turn-start.sh` on `UserPromptSubmit` → mark window `● claude`
-- `turn-done-notify.sh` on `Stop` → mark window `✓ claude` (and send an OS
+Every pane has a top border. Its right side shows the state of the Claude
+Code session running inside **that specific pane**, updated every 2s:
+
+| What you see on the pane border | Meaning |
+|---|---|
+| `● running` (green, bold) | agent is working on a turn |
+| `✓ done` (dim gray) | last turn completed |
+| `⚠ input needed` (yellow, bold) | Claude wants the human's input |
+| (nothing) | no Claude Code running in that pane |
+
+This is the "look at all four panes at once" pattern: you keep working in
+one pane and see the state of the other three by peripheral vision on
+their borders. No window switching required.
+
+### Per-window title (secondary, for window-picker glance)
+
+The tmux window's *name* also gets a matching glyph prefix (`● claude` /
+`✓ claude` / `⚠ claude`) and the status bar at the bottom colors each
+window accordingly. Useful when you keep multiple windows and want the
+status-bar picker (`C-a w`) to show colors.
+
+Caveat: window rename is "last writer wins" across panes. If two panes in
+the same window both run Claude Code, the window title reflects only the
+most-recent transition. The **pane borders are the ground truth**.
+
+### How it works
+
+Three Claude Code hooks under `~/.claude/hooks/`:
+- `turn-start.sh` on `UserPromptSubmit` → state = running
+- `turn-done-notify.sh` on `Stop` → state = done (also sends an OS
  notification if the turn took ≥ 10 seconds)
-- `turn-attention.sh` on `Notification` → mark window `⚠ claude` and send an
- OS notification
+- `turn-attention.sh` on `Notification` → state = attention, OS notification
 
-Colors are set in `files/.tmux.conf` via `window-status-format` matching the
-leading glyph. Everything works only when Claude Code runs inside tmux;
-outside tmux the hooks are silent no-ops.
+They call `tmux-mark.sh <state>`, which:
+1. Writes `~/.claude/state/pane-<PANE_ID>.state`
+2. Renames the current tmux window with the matching glyph
 
-**Practical use:** put each Claude Code session in its own tmux window
-(`C-a c` to create). Then when you switch to another window and keep
-working, a peek at the status bar reveals which agents are green (running),
-gray (done, safe to check), or yellow (need you). `C-a w` opens the window
-picker with names visible for fast switching.
+The tmux `pane-border-format` calls `tmux-pane-status.sh` per pane every
+2s, reads the state file, prints a colored glyph. Outside tmux the hooks
+are silent no-ops.
+
+### Secondary signal: activity indicator
+
+`monitor-activity on` in our config also flags background panes that
+produced output (Claude streaming, tests running, etc.). This is a
+subtle "something happened over there" cue, distinct from the primary
+hook-driven state.
 
 ## Persistence: the killer feature
 
