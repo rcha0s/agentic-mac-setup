@@ -25,6 +25,11 @@ opt.timeoutlen = 400
 opt.clipboard = "unnamedplus"
 opt.mouse = "a"
 opt.wrap = false
+opt.cursorline = true              -- highlight the current line
+opt.cursorlineopt = "number,line"  -- highlight number column + line body
+-- Make the block cursor visible on top of dark plugin backgrounds (Neogit,
+-- oil, snacks). Vertical bar in insert mode; block elsewhere; blink on.
+opt.guicursor = "n-v-c-sm:block-blinkwait700-blinkoff400-blinkon250,i-ci-ve:ver25,r-cr-o:hor20"
 
 -- lazy.nvim bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"

@@ -7,6 +7,7 @@ return {
       "sindrets/diffview.nvim",
       "nvim-telescope/telescope.nvim",
     },
+    cmd = { "Neogit", "DiffviewOpen", "DiffviewClose" },
     keys = {
       { "<leader>gg", "<cmd>Neogit<cr>", desc = "Neogit" },
       { "<leader>gc", "<cmd>Neogit commit<cr>", desc = "Neogit commit" },
