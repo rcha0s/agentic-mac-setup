@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# install-noix.sh — No-Nix install path for Kun Chen's agentic setup.
+# install-noix.sh: No-Nix install path for the Kun-style agentic setup.
 #
 # What this does:
 #   1. brew install: tmux, neovim, starship, zsh-autosuggestions,
-#      zsh-syntax-highlighting (all under Workbrew's default allowlist).
-#      Casks: wezterm, amethyst (optional, gated by INSTALL_CASKS).
+#      zsh-syntax-highlighting, gh, ripgrep, fd, jq, lazygit, fastfetch.
+#      Casks: wezterm, amethyst (skippable via SKIP_CASKS=1).
 #   2. Symlinks the seeded configs from this fork into $HOME/.config/* and
 #      $HOME/.tmux.conf. Backs up any existing non-symlink files first.
 #   3. Appends a source line to ~/.zshrc so zshrc.local is loaded.
@@ -18,12 +18,19 @@
 #   - System-wide sudo mutations. Every step is user-scoped.
 #   - Overwrite existing files without backing them up first.
 #
+# Requires:
+#   - Homebrew installed. If not present, install first from https://brew.sh.
+#   - If your Mac uses Workbrew (an enterprise Homebrew wrapper with an
+#     allowlist), the script will still try each install; blocked packages
+#     print a warning and are skipped. Submit them via
+#     `brew workbrew request <name>` and re-run this script when approved.
+#
 # Flags:
-#   DRY_RUN=1     preview commands without running them
-#   SKIP_BREW=1   skip Homebrew installs (assumes tools present)
-#   SKIP_CASKS=1  skip wezterm/amethyst casks (default: install them)
+#   DRY_RUN=1       preview commands without running them
+#   SKIP_BREW=1     skip Homebrew installs (assumes tools present)
+#   SKIP_CASKS=1    skip wezterm/amethyst casks (default: install them)
 #   SKIP_AGENTIC=1  skip the agentic stack install
-#   SKIP_ZSHRC=1  don't touch ~/.zshrc
+#   SKIP_ZSHRC=1    don't touch ~/.zshrc
 #
 # Usage:
 #   cd ~/github/agentic-mac-setup
@@ -44,33 +51,56 @@ run()  {
   fi
 }
 
-# --- 1. Homebrew packages --------------------------------------------------
+# --- 1. Homebrew preflight + packages --------------------------------------
 
 if [ "${SKIP_BREW:-0}" != "1" ]; then
   if ! command -v brew >/dev/null 2>&1; then
-    warn "brew not found; skipping package install. Install Homebrew (or use Workbrew) and re-run."
-  else
-    log "installing formulas via brew"
-    for f in tmux neovim starship zsh-autosuggestions zsh-syntax-highlighting gh ripgrep fd jq lazygit fastfetch; do
-      if brew list --formula "$f" >/dev/null 2>&1; then
-        log "  already installed: $f"
+    warn "brew not found. Install Homebrew from https://brew.sh and re-run:"
+    warn "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+    exit 1
+  fi
+
+  # Detect an enterprise Homebrew wrapper (e.g. Workbrew) so the failure
+  # message on blocked installs can be actionable.
+  IS_ENTERPRISE_BREW=0
+  BREW_PATH="$(command -v brew)"
+  case "$BREW_PATH" in
+    */workbrew/*|*/workbrew.io/*) IS_ENTERPRISE_BREW=1 ;;
+  esac
+  if [ "$IS_ENTERPRISE_BREW" = "1" ]; then
+    log "detected enterprise Homebrew wrapper at $BREW_PATH; blocked packages will need admin approval"
+  fi
+
+  on_install_fail() {
+    local kind="$1"   # formula|cask
+    local name="$2"
+    if [ "$IS_ENTERPRISE_BREW" = "1" ]; then
+      warn "  failed to install $kind $name (allowlist?). Try: brew workbrew request $name"
+    else
+      warn "  failed to install $kind $name; continuing"
+    fi
+  }
+
+  log "installing formulas via brew"
+  for f in tmux neovim starship zsh-autosuggestions zsh-syntax-highlighting gh ripgrep fd jq lazygit fastfetch; do
+    if brew list --formula "$f" >/dev/null 2>&1; then
+      log "  already installed: $f"
+    else
+      log "  installing: $f"
+      run brew install "$f" || on_install_fail formula "$f"
+    fi
+  done
+
+  if [ "${SKIP_CASKS:-0}" != "1" ]; then
+    log "installing casks via brew"
+    for c in wezterm amethyst; do
+      if brew list --cask "$c" >/dev/null 2>&1; then
+        log "  already installed: $c"
       else
-        log "  installing: $f"
-        run brew install "$f" || warn "failed to install $f (Workbrew allowlist?) — continuing"
+        log "  installing cask: $c"
+        run brew install --cask "$c" || on_install_fail cask "$c"
       fi
     done
-
-    if [ "${SKIP_CASKS:-0}" != "1" ]; then
-      log "installing casks via brew"
-      for c in wezterm amethyst; do
-        if brew list --cask "$c" >/dev/null 2>&1; then
-          log "  already installed: $c"
-        else
-          log "  installing cask: $c"
-          run brew install --cask "$c" || warn "failed to install cask $c (Workbrew allowlist?) — continuing"
-        fi
-      done
-    fi
   fi
 fi
 

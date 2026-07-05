@@ -4,22 +4,22 @@ WezTerm is your terminal emulator. In Kun's setup it's intentionally boring: **o
 
 ## Install
 
-Workbrew blocked the `--cask` install. Pick one:
+Default path:
 
-**Option A — request approval (corp-policy-friendly):**
-```
-brew workbrew request wezterm
-```
-Wait for your admin to approve, then:
 ```
 brew install --cask wezterm
 ```
 
-**Option B — download directly (bypasses Workbrew):**
+If your Mac uses an enterprise Homebrew wrapper (Workbrew or similar) and the
+cask is blocked by an allowlist, either request it (`brew workbrew request wezterm`
+where supported, then re-run the install) or download the app directly:
+
 1. Go to <https://wezterm.org/install/macos.html>
 2. Download the latest `WezTerm-macos-*.zip`
-3. Unzip; drag `WezTerm.app` to `/Applications`
-4. Launch it — it reads `~/.config/wezterm/wezterm.lua`, which is already symlinked
+3. Unzip; drag `WezTerm.app` to `/Applications` (or `~/Applications/` if
+   `/Applications` is locked)
+4. Launch it. WezTerm reads `~/.config/wezterm/wezterm.lua`, which is already
+   symlinked by `setup/install-noix.sh`.
 
 ## Config location
 
@@ -29,9 +29,9 @@ Edit the fork's copy; changes reload live (WezTerm watches the file).
 
 ## What our config sets
 
-- **`window_decorations = "RESIZE"`** — no title bar, just a resize border
-- **`enable_tab_bar = false`** — no tab bar
-- **`native_macos_fullscreen_mode = true`** — Cmd-Enter to fullscreen properly
+- **`window_decorations = "RESIZE"`**: no title bar, just a resize border
+- **`enable_tab_bar = false`**: no tab bar
+- **`native_macos_fullscreen_mode = true`**: Cmd-Enter to fullscreen properly
 - Rose-pine-moon color scheme, Hack Nerd Font, 15pt on macOS
 - 80% window opacity + macOS background blur
 
@@ -54,14 +54,14 @@ That's all you need to know about WezTerm keybinds. Everything else lives in tmu
 
 - WezTerm crashes / renders weird: check `~/.local/share/wezterm/logs/` (verbose).
 - Config error: `wezterm --config-file ~/.config/wezterm/wezterm.lua ls-fonts` prints errors.
-- Font missing: `brew install --cask font-hack-nerd-font` — required for the icons in the tmux status line and Neovim UI.
+- Font missing: `brew install --cask font-hack-nerd-font`, required for the icons in the tmux status line and Neovim UI.
 
 ## Learn more
 
 - Official docs: <https://wezterm.org/> (short, well-organized)
 - Config reference: <https://wezterm.org/config/files.html>
 - Every option: <https://wezterm.org/config/lua/config/index.html>
-- **[Josean Martinez — How I Use Wezterm & Zsh For An Amazing Terminal Setup On My Mac](https://www.youtube.com/watch?v=TTgQV21X0SQ)** — concrete config walkthrough
+- **[Josean Martinez: How I Use Wezterm & Zsh For An Amazing Terminal Setup On My Mac](https://www.youtube.com/watch?v=TTgQV21X0SQ)**: concrete config walkthrough
 - See `docs/RESOURCES.md` for the full index
 
-Kun's rationale for WezTerm-over-Alacritty/kitty: cross-platform, actively maintained, native Lua config, great macOS integration. He doesn't customize it much — tmux does the work.
+Kun's rationale for WezTerm-over-Alacritty/kitty: cross-platform, actively maintained, native Lua config, great macOS integration. He doesn't customize it much, tmux does the work.
