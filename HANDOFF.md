@@ -16,6 +16,8 @@
 - `~/.tmux.conf` → `files/.tmux.conf`
 - `~/.zshrc.local` → `files/zshrc.local`
 - `~/.zshrc`: has a source line at the bottom loading `.zshrc.local`
+- `~/.claude/hooks/*.sh` → `files/claude-hooks/*.sh` (6 hooks: turn
+  lifecycle + tmux status integration)
 
 **Agentic CLIs** (Volta-managed for npm, `~/.local/bin` for the two Go tools):
 - `gh-axi`, `chrome-devtools-axi`, `tasks-axi`, `lavish-axi`, `gnhf`
@@ -86,6 +88,29 @@ Needed by `gh-axi`, `no-mistakes`, and `firstmate`.
 cd <your-repo>
 no-mistakes init
 ```
+
+### 7. Activate the Claude Code turn-lifecycle hooks
+
+The installer symlinks the hook scripts into `~/.claude/hooks/` but does
+not modify your `~/.claude/settings.json` (which already contains
+per-user secrets and permissions we should not clobber). One-time
+manual wiring:
+
+1. Open `~/.claude/settings.json` in your editor.
+2. Open `files/claude-hooks/settings.example.json` in the fork.
+3. Copy the three entries under the example's `hooks` block
+   (`UserPromptSubmit`, `Stop`, `Notification`) into your settings.json's
+   `hooks` block. If the block does not exist, add it. If there are
+   already `UserPromptSubmit` or `Stop` entries (from other tools like
+   the `auto-permissions-from-plan` skill), append rather than replace.
+4. Save and restart Claude Code.
+
+What activates:
+- Per-pane and session-wide tmux status indicators (green/gray/yellow)
+- macOS notification when a turn takes over 10 seconds
+- macOS notification when Claude wants your input mid-run
+
+See `docs/LEARN-TMUX.md` "Agent status indicators" for the full picture.
 
 ## Where to learn each piece
 

@@ -135,6 +135,16 @@ backup_and_link "$DOTFILES_DIR/files/.config/nvim"     "$HOME/.config/nvim"
 backup_and_link "$DOTFILES_DIR/files/.config/starship.toml" "$HOME/.config/starship.toml"
 backup_and_link "$DOTFILES_DIR/files/.tmux.conf"       "$HOME/.tmux.conf"
 
+# Claude Code hooks: turn lifecycle + tmux status integration
+log "symlinking Claude Code hooks"
+for h in tmux-mark tmux-pane-status tmux-fleet-status \
+         turn-start turn-done-notify turn-attention; do
+  backup_and_link "$DOTFILES_DIR/files/claude-hooks/${h}.sh" \
+                  "$HOME/.claude/hooks/${h}.sh"
+done
+log "  hooks-settings template: $DOTFILES_DIR/files/claude-hooks/settings.example.json"
+log "  merge its hooks{} block into ~/.claude/settings.json to activate"
+
 # zshrc.local is a personal file bootstrapped from a public template on
 # first run. Never overwrite an existing one.
 if [ ! -f "$DOTFILES_DIR/files/zshrc.local" ]; then

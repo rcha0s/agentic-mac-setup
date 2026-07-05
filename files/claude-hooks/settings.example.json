@@ -1,0 +1,26 @@
+{
+  "_comment": "Hook wiring for the turn-lifecycle + tmux status pattern. Merge the 'hooks' block into your own ~/.claude/settings.json (which likely already has env vars, permissions, etc. that must not be clobbered). Do NOT copy this whole file over settings.json.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "$HOME/.claude/hooks/turn-start.sh", "timeout": 2 }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "$HOME/.claude/hooks/turn-done-notify.sh", "timeout": 5 }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          { "type": "command", "command": "$HOME/.claude/hooks/turn-attention.sh", "timeout": 5 }
+        ]
+      }
+    ]
+  }
+}
