@@ -32,7 +32,9 @@ Every command below is: `press C-a, release, then press the next key`. Notation:
 | List sessions | `tmux ls` |
 | New window | `C-a c` |
 | Next / previous window | `C-a n` / `C-a p` |
-| Jump to window N | `C-a <N>` (0-indexed but our config uses 1-indexed) |
+| Jump to window N (our config is 1-indexed) | `C-a 1`, `C-a 2`, ... |
+| Interactive window picker | `C-a w` |
+| Interactive session picker | `C-a s` |
 | Split vertically (side-by-side) | `C-a \|` |
 | Split horizontally (stacked) | `C-a -` |
 | Move between panes | `C-a h/j/k/l` (vim-style) |
@@ -41,6 +43,82 @@ Every command below is: `press C-a, release, then press the next key`. Notation:
 | Command prompt (type any tmux command) | `C-a :` |
 | Reload config | `C-a r` |
 | Zoom current pane fullscreen (toggle) | `C-a z` |
+
+## Sessions vs. windows vs. panes: which one do I want?
+
+The three layers exist for different reasons. Pick by the question you're
+answering:
+
+| Question | Answer |
+|---|---|
+| A different project (different repo, different mental context) | New **session** (`tmux new -s <name>`) |
+| A different concern in the same project (frontend / backend / logs / notes) | New **window** in current session (`C-a c`) |
+| Related views of the same concern (edit + run + tail logs, all at once) | New **pane** in current window (`C-a \|` / `C-a -`) |
+
+## Building layouts: several concurrent things visible at once
+
+Splitting is the important skill.
+
+```
+C-a |      # split current pane left/right
+C-a -      # split current pane top/bottom
+```
+
+Splits act on the **current pane**, not the whole window. So to build a 4-pane
+grid: split once vertically, move to the right pane, split it horizontally,
+move back to the left pane, split it horizontally. Result: 2x2 grid.
+
+Once you have a bunch of panes, use built-in layout presets:
+
+- `C-a Space` cycles through the standard layouts: `even-horizontal`,
+  `even-vertical`, `main-horizontal`, `main-vertical`, `tiled`. `tiled`
+  auto-evens N panes into a grid. Fastest way to arrange 8 panes.
+- `C-a M-1` through `C-a M-5` jump directly to layouts 1-5.
+
+Resizing:
+
+- `C-a z` **zoom** current pane fullscreen (toggle). Kun's most-used tmux
+  command. Watch one thing at a time without losing the grid.
+- `C-a` then arrow keys (or `H` / `J` / `K` / `L`) resize the pane border by
+  5 cells. Hold for continuous resize.
+- Mouse drag on any pane border also works (`mouse on` in our config).
+
+## Recipes for common shapes
+
+**Two agents side by side.** One window, two panes:
+
+```
+C-a |
+```
+
+**Edit + run + logs.** One window, three panes with editor on top, run and
+logs sharing the bottom:
+
+```
+C-a -              # split window into top/bottom
+C-a j              # move to bottom pane
+C-a |              # split bottom into left/right
+```
+
+**8 agents visible at once (Kun-style).** Two windows, 4-tile grid in each:
+
+```
+# In window 1:
+C-a |; C-a l; C-a -; C-a h; C-a -    # 4 panes, 2x2 grid
+C-a c                                # new window
+# In window 2: repeat the 4-pane split
+```
+
+Switch between the two agent groups with `C-a 1` / `C-a 2`, or `C-a w` for
+the picker. Zoom any single agent with `C-a z`.
+
+**A 4x2 grid of 8 panes in one window** (harder to read on a laptop but
+works on a large monitor):
+
+```
+# Create 8 panes any way, then normalize:
+C-a Space           # cycle to 'tiled' layout
+```
 
 ## Copy mode (scroll back: copy text)
 
@@ -70,14 +148,22 @@ Our config includes two plugins that make sessions survive reboots:
 Kun runs a session per project:
 
 ```bash
-tmux new -s myproject # from a fresh shell (or C-a : new-session)
+tmux new -s myproject       # start a named session from a fresh shell
 # do work; C-a d to detach
-tmux new -s another # new project
-tmux ls # list all sessions
-tmux attach -t myproject # attach to specific
+tmux new -s another         # new project
+tmux ls                     # list all sessions
+tmux attach -t myproject    # attach to specific
+tmux kill-session -t old    # delete a session you no longer need
 ```
 
-Our zsh auto-attaches to `main` on shell open. To switch to a different session inside tmux: `C-a s` shows a session picker.
+Our zsh auto-attaches to `main` on interactive shell open. Once inside any
+session, `C-a s` shows an interactive session picker (arrow to pick, Enter to
+switch). `C-a $` renames the current session.
+
+**Attach vs. switch:** if a session is already attached in another terminal,
+`tmux attach -t <name>` will attach a second client to it (both terminals
+see and drive the same screen). That's what lets you attach from a phone
+mid-day and pick up where you left off.
 
 ## Sending commands to panes from outside
 

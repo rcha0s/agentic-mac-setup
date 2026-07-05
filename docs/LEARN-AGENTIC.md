@@ -36,8 +36,8 @@ Kun Chen's agentic workflow, every tool you now have installed, when to use it, 
 
 | Tool | Manual form | What it does | When Claude Code uses it |
 |---|---|---|---|
-| **gh-axi** | `gh-axi issues`, `gh-axi prs`, etc. | Agent-ergonomic wrapper over `gh` | Any task touching GitHub |
-| **chrome-devtools-axi** | `chrome-devtools-axi navigate <url>` | Browser automation | Any web task |
+| **gh-axi** | `gh-axi issue list`, `gh-axi pr view 42`, `gh-axi run list` | Agent-ergonomic wrapper over `gh` | Any task touching GitHub |
+| **chrome-devtools-axi** | `chrome-devtools-axi open <url>`, `snapshot`, `click @<uid>` | Browser automation | Any web task |
 | **tasks-axi** | `tasks-axi` (shows backlog) | Backlog manager over `backlog.md` | Backlog / task ops |
 | **lavish-axi** | agent-invoked | Turns HTML artifacts into reviewable surfaces | When output is easier to grasp visually |
 
@@ -45,9 +45,17 @@ You don't call these yourself in a Claude Code session, Claude decides. Verify t
 
 Try it now:
 ```bash
-gh-axi --help # sanity check
-tasks-axi # shows backlog for current dir
+gh-axi                 # dashboard for current repo (no args needed)
+gh-axi issue list      # list issues in agent-ergonomic form
+tasks-axi              # shows backlog for current dir
+chrome-devtools-axi    # list subcommands
 ```
+
+Full subcommand set for each: run the CLI with `--help`. Notable ones:
+`gh-axi` uses **singular** nouns (`issue`, `pr`, `run`, `workflow`, `release`,
+`repo`, `label`, `secret`, `variable`, `search`, `api`). `chrome-devtools-axi`
+uses `open <url>` (not `navigate`), plus `snapshot`, `click`, `fill`,
+`screenshot`, `eval`, `pages`.
 
 ### gnhf: "Good Night, Have Fun"
 

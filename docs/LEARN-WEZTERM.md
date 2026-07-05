@@ -25,30 +25,56 @@ where supported, then re-run the install) or download the app directly:
 
 `~/.config/wezterm/wezterm.lua` → symlink → `~/github/agentic-mac-setup/files/.config/wezterm/wezterm.lua`
 
-Edit the fork's copy; changes reload live (WezTerm watches the file).
+Edit the fork's copy; changes reload **live** (WezTerm watches the file and
+re-parses on save). If the config has a Lua syntax error the current window
+keeps its old settings and a notification shows the error. Use
+`wezterm --config-file <path> ls-fonts` from a shell to validate a config
+change without waiting for the reload.
 
 ## What our config sets
 
 - **`window_decorations = "RESIZE"`**: no title bar, just a resize border
 - **`enable_tab_bar = false`**: no tab bar
-- **`native_macos_fullscreen_mode = true`**: Cmd-Enter to fullscreen properly
+- **`native_macos_fullscreen_mode = true`**: cleaner native fullscreen behavior
 - Rose-pine-moon color scheme, Hack Nerd Font, 15pt on macOS
 - 80% window opacity + macOS background blur
 
-## Essential keybinds (all defaults)
+## Essential keybinds (defaults on macOS)
+
+Verified against `wezterm show-keys` for WezTerm build `20240203-110809`.
+Note: WezTerm uses **Ctrl+Shift** for its command-palette / debug shortcuts,
+not `Cmd+Shift` like most macOS apps. And fullscreen is bound to
+**Option+Enter**, not `Cmd+Enter`.
 
 | Action | Keybind |
 |---|---|
-| Copy | Cmd-C |
-| Paste | Cmd-V |
-| Increase font size | Cmd-`+` |
-| Decrease font size | Cmd-`-` |
-| Reset font size | Cmd-`0` |
-| Show launcher | Cmd-Shift-P |
-| Show debug overlay | Cmd-Shift-L |
-| Fullscreen | Cmd-Enter |
+| Copy | `Cmd-C` |
+| Paste | `Cmd-V` |
+| Search selection / prompt | `Cmd-F` |
+| Clear scrollback | `Cmd-K` |
+| Decrease font size | `Cmd--` |
+| Reset font size | `Cmd-0` |
+| Increase font size | `Ctrl-Shift-+` |
+| **Show command palette** | `Ctrl-Shift-P` |
+| **Show debug overlay** | `Ctrl-Shift-L` |
+| **Toggle fullscreen** | `Option-Enter` |
 
-That's all you need to know about WezTerm keybinds. Everything else lives in tmux.
+That's all you need to know about WezTerm keybinds. Everything else lives in
+tmux.
+
+If you want the more macOS-conventional bindings (`Cmd-Shift-P`, `Cmd-Enter`,
+etc.), you can override them explicitly in `wezterm.lua`:
+
+```lua
+config.keys = {
+  { key = "p", mods = "SUPER|SHIFT", action = wezterm.action.ActivateCommandPalette },
+  { key = "l", mods = "SUPER|SHIFT", action = wezterm.action.ShowDebugOverlay },
+  { key = "Enter", mods = "SUPER", action = wezterm.action.ToggleFullScreen },
+}
+```
+
+Kun does not do this; he leans on tmux for everything and rarely touches
+WezTerm's own commands.
 
 ## Debugging
 

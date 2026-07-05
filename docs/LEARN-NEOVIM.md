@@ -69,6 +69,41 @@ Leader key is **space**. So `<leader>ff` means "press space, then f, then f".
 2. **lazy.nvim will bootstrap**, clones itself, installs the 4 plugins listed above. Watch the progress; hit `q` when done.
 3. Quit and reopen. Now the plugins are loaded.
 
+## Opening files
+
+- `nvim path/to/file` from the shell opens that file directly.
+- `nvim .` (in a directory) opens Oil at that directory (Oil is the default
+  file explorer per our config).
+- Inside Neovim: `:e path/to/file` to open by path with tab-completion.
+- Inside Neovim: `<space>ff` (snacks picker) fuzzy-finds any file in cwd.
+  This is the day-to-day way to open files.
+
+## Splits inside Neovim
+
+Separate from tmux panes: Neovim can also split its own window into multiple
+edit regions viewing different buffers.
+
+| Do | Press |
+|---|---|
+| Split horizontally (top/bottom) | `Ctrl-w s` or `:split` |
+| Split vertically (left/right) | `Ctrl-w v` or `:vsplit` |
+| Move between splits | `Ctrl-w h/j/k/l` |
+| Close current split | `Ctrl-w q` or `:q` |
+| Make current split take all space | `Ctrl-w o` |
+| Equalize split sizes | `Ctrl-w =` |
+
+Rule of thumb: use **tmux panes** for split views that mix editor + shells;
+use **Neovim splits** for viewing two files at once.
+
+## Managing plugins
+
+- `:Lazy` opens the lazy.nvim UI. From here you can `x` disable, `X` enable,
+  `U` update, `S` sync, or `?` for help. Useful when a plugin misbehaves.
+- `:Lazy sync` non-interactive: install missing, update installed.
+- `:Lazy log <plugin>` shows the last few commits of a plugin.
+- To disable a plugin permanently: edit its file under
+  `~/.config/nvim/lua/plugins/` and set `enabled = false` in the spec.
+
 ## Config keybinds (from `~/.config/nvim/lua/plugins/*.lua`)
 
 ### File navigation (oil.nvim)
@@ -138,3 +173,5 @@ After ~2 weeks of daily use, motions become muscle memory. That's the payoff.
 - **"Arrow keys don't work in insert mode"** → they do; but learn hjkl in normal mode instead. You'll thank yourself.
 - **Neovim froze** → you probably hit `Ctrl-s` which sends XOFF to the terminal. Press `Ctrl-q` to resume.
 - **Plugin errors on startup** → `:Lazy` shows plugin status; `:Lazy sync` re-installs.
+- **"I forgot a keybind"** → `<space>fk` opens the snacks Keymaps picker; type any part of the description to filter and jump.
+- **":Neogit is not an editor command"** → the plugin lazy-loads on `<space>gg` and on `:Neogit`. If neither works, run `:Lazy load neogit` once.
