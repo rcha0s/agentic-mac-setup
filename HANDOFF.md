@@ -1,21 +1,21 @@
-# Handoff — Kun Chen agentic setup (No-Nix path)
+# Handoff: Kun-style agentic setup (No-Nix path)
 
 **Status:** the no-Nix install has run. Most of the stack is live on this machine.
 
-## What's installed and working ✓
+## What's installed and working
 
-**Homebrew formulas (via Workbrew — all allowlisted):**
+**Homebrew formulas:**
 - tmux, neovim, starship
 - zsh-autosuggestions, zsh-syntax-highlighting
 - gh, ripgrep, fd, jq, lazygit, fastfetch
 
 **Config symlinks** (edit the sources under `~/github/agentic-mac-setup/files/`):
-- `~/.config/wezterm/`   → `files/.config/wezterm/`
-- `~/.config/nvim/`      → `files/.config/nvim/`
+- `~/.config/wezterm/` → `files/.config/wezterm/`
+- `~/.config/nvim/` → `files/.config/nvim/`
 - `~/.config/starship.toml` → `files/.config/starship.toml`
-- `~/.tmux.conf`         → `files/.tmux.conf`
-- `~/.zshrc.local`       → `files/zshrc.local`
-- `~/.zshrc` — has a source line at the bottom loading `.zshrc.local`
+- `~/.tmux.conf` → `files/.tmux.conf`
+- `~/.zshrc.local` → `files/zshrc.local`
+- `~/.zshrc`: has a source line at the bottom loading `.zshrc.local`
 
 **Agentic CLIs** (Volta-managed for npm, `~/.local/bin` for the two Go tools):
 - `gh-axi`, `chrome-devtools-axi`, `tasks-axi`, `lavish-axi`, `gnhf`
@@ -31,30 +31,26 @@
 
 **firstmate cloned** at `~/github/firstmate/`
 
-## What you still need to do manually ⚠
+## What you still need to do manually
 
-### 1. Install WezTerm.app (Workbrew blocked the cask)
+### 1. Install WezTerm.app
 
-Pick one:
-
-**a) Request approval:**
+Default path:
 ```bash
-brew workbrew request wezterm
-# wait for admin approval, then:
 brew install --cask wezterm
 ```
 
-**b) Download directly:**
+**If your Mac uses Workbrew (or another enterprise Homebrew wrapper) and the
+cask is blocked**, either request the cask via `brew workbrew request wezterm`
+and re-run, or install directly:
 1. <https://wezterm.org/install/macos.html>
 2. Download `WezTerm-macos-*.zip`
-3. Unzip; drag `WezTerm.app` to `/Applications`
-4. Launch — it reads `~/.config/wezterm/wezterm.lua` automatically
+3. Unzip and drag `WezTerm.app` to `/Applications` (or `~/Applications/` if
+   `/Applications` is locked by MDM)
+4. Launch. It reads `~/.config/wezterm/wezterm.lua` automatically.
 
-**Amethyst** (optional tiling window manager) has the same story:
-```bash
-brew workbrew request amethyst
-# or download: https://ianyh.com/amethyst/
-```
+**Amethyst** (optional tiling window manager): `brew install --cask amethyst`,
+or download from <https://ianyh.com/amethyst/>.
 
 ### 2. Restart your shell
 
@@ -93,18 +89,18 @@ no-mistakes init
 
 ## Where to learn each piece
 
-- `docs/LEARN-WEZTERM.md` — terminal basics, config, videos
-- `docs/LEARN-TMUX.md` — the load-bearing primitive; learn this first
-- `docs/LEARN-NEOVIM.md` — modes, motions, plugin keybinds, learning path
-- `docs/LEARN-AGENTIC.md` — full Kun-style workflow across all 7 agentic tools
+- `docs/LEARN-WEZTERM.md`: terminal basics, config, videos
+- `docs/LEARN-TMUX.md`: the load-bearing primitive; learn this first
+- `docs/LEARN-NEOVIM.md`: modes, motions, plugin keybinds, learning path
+- `docs/LEARN-AGENTIC.md`: full Kun-style workflow across all 7 agentic tools
 
-## The Nix files are still here — why?
+## The Nix files are still here: why?
 
 `flake.nix`, `nix/host.nix`, `nix/user.nix`, `setup/mac.sh`, `setup/agentic.sh`, `tests/mac_setup_test.sh` are the **Nix-based reproducibility path** from the upstream repo, preserved for future use.
 
 You can ignore them for now. If you later decide reproducibility across machines is worth the trade-off (personal Mac, or work-Mac after IT clearance), running `bash setup/mac.sh` on a fresh Mac will land the same setup + our seeded configs.
 
-`setup/install-noix.sh` is what we ran here. It's idempotent — safe to re-run to pick up changes.
+`setup/install-noix.sh` is what we ran here. It's idempotent, safe to re-run to pick up changes.
 
 ## Verification checklist
 
@@ -120,20 +116,21 @@ You can ignore them for now. If you later decide reproducibility across machines
 - [ ] `treehouse --help` works
 - [ ] `no-mistakes --help` works
 - [ ] `ls ~/.claude/skills/` shows the four AXI skills
-- [ ] `claude` in any repo — SessionStart output mentions gh/chrome/tasks ambient context
+- [ ] `claude` in any repo: SessionStart output mentions gh/chrome/tasks ambient context
 - [ ] Reboot: `tmux attach` restores the session (tmux-resurrect)
 
-## Remote access — deliberately skipped
+## Remote access: deliberately skipped
 
 Kun's Layer 4 setup (Tailscale + mosh) enables SSH-from-phone into your
 Mac over a WireGuard mesh. **mosh** is installed. **Tailscale is skipped**
 on this work Mac:
 
 - Tailscale creates a second encrypted tunnel that corporate security
-  can't inspect — classic split-tunnel/exfiltration flag.
+ can't inspect, a classic split-tunnel / exfiltration flag.
 - Would broaden attack surface on the corp Mac for a personal-productivity
-  win, not a work need.
-- Realistic outcome of a Workbrew request: denied.
+ win, not a work need.
+- On an enterprise-managed Mac, a request to allowlist it is likely to be
+ denied.
 
 If you ever move this setup to a personal Mac, install Tailscale via
 `brew install --cask tailscale`, sign in, `tailscale up`, then SSH via the
@@ -141,12 +138,12 @@ device's `*.tail….ts.net` hostname. mosh handles connection drops.
 
 ## Reverting the install
 
-Non-destructive — everything's user-scoped and reversible.
+Non-destructive, everything's user-scoped and reversible.
 
 **Remove config symlinks:**
 ```bash
 for f in ~/.config/wezterm ~/.config/nvim ~/.config/starship.toml ~/.tmux.conf ~/.zshrc.local; do
-  [ -L "$f" ] && rm "$f"
+ [ -L "$f" ] && rm "$f"
 done
 ```
 

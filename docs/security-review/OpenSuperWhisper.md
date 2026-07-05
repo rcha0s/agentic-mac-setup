@@ -1,4 +1,4 @@
-# Security review — OpenSuperWhisper
+# Security review, OpenSuperWhisper
 
 **Submitter:** Rohan Isawe
 **App:** OpenSuperWhisper by Starmel
@@ -9,7 +9,7 @@
 
 ## Summary
 
-OpenSuperWhisper is a fully **local, on-device** speech-to-text app for macOS. It uses open-source ASR (Automatic Speech Recognition) engines — Whisper.cpp or NVIDIA Parakeet — running entirely in-process on the Mac. **No audio or transcription data is sent to any external server.**
+OpenSuperWhisper is a fully **local, on-device** speech-to-text app for macOS. It uses open-source ASR (Automatic Speech Recognition) engines (Whisper.cpp or NVIDIA Parakeet) running entirely in-process on the Mac. **No audio or transcription data is sent to any external server.**
 
 The only network activity is a one-time download of the model file (~1.6 GB) from HuggingFace or the FluidAudio release page. After that, the app functions fully offline.
 
@@ -31,8 +31,8 @@ The transcription pipeline is: **Microphone → local ASR engine (whisper.cpp or
 ## Why this is different from cloud dictation
 
 Confidential Smartsheet content (architecture, tickets, threat models, code review notes, internal discussions) can be transcribed without any of it reaching:
-- OpenAI (creator of Whisper — provides only the static model weights, does not receive user audio)
-- NVIDIA (creator of Parakeet — same, released the weights)
+- OpenAI (creator of Whisper: provides only the static model weights, does not receive user audio)
+- NVIDIA (creator of Parakeet: same, released the weights)
 - Any SaaS provider
 
 This is why local Whisper is preferred over Whisper API, macOS "Enhanced Dictation" (Apple-server-side), or Otter.ai for enterprise use.
@@ -65,7 +65,7 @@ Any of the below can be run by IT to confirm:
 
 | Alternative | Reason not chosen |
 |---|---|
-| macOS built-in dictation | "Enhanced Dictation" is server-side (Apple) — confidential content leaves the device. |
+| macOS built-in dictation | "Enhanced Dictation" is server-side (Apple): confidential content leaves the device. |
 | Whisper API (OpenAI cloud) | Cloud round-trip; audio content sent to OpenAI. Not enterprise-safe. |
 | Otter.ai / Rev / SpeakEasy | SaaS; all audio uploaded. Not enterprise-safe. |
 | Do without voice input | Loses productivity gain (Kun Chen's video shows ~5x prompt throughput). |
@@ -78,13 +78,13 @@ Only OpenSuperWhisper delivers **local execution + open source + no data egress*
 
 **Product**
 - Official repository: <https://github.com/Starmel/OpenSuperWhisper>
-- License: MIT — <https://github.com/Starmel/OpenSuperWhisper/blob/main/LICENSE>
+- License: MIT: <https://github.com/Starmel/OpenSuperWhisper/blob/main/LICENSE>
 - Latest release: <https://github.com/Starmel/OpenSuperWhisper/releases/latest>
 - Build/CI workflow (proves reproducible build): <https://github.com/Starmel/OpenSuperWhisper/blob/main/.github/workflows/build.yml>
 
 **Underlying engines (both open source, both run locally)**
-- Whisper.cpp — <https://github.com/ggerganov/whisper.cpp>
-- Parakeet via FluidAudio — <https://github.com/AntinomyCollective/FluidAudio>
+- Whisper.cpp: <https://github.com/ggerganov/whisper.cpp>
+- Parakeet via FluidAudio: <https://github.com/AntinomyCollective/FluidAudio>
 
 **Model weights (one-time download, then offline)**
 - Whisper models on HuggingFace: <https://huggingface.co/ggerganov/whisper.cpp/tree/main>

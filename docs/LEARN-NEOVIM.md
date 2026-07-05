@@ -1,6 +1,6 @@
 # Learn Neovim
 
-Neovim is your editor when you need it. In Kun's workflow it does **filesystem navigation, diff review, small manual edits, and git surface** — the agent writes the bulk of code, but Neovim is the surgical tool.
+Neovim is your editor when you need it. In Kun's workflow it does **filesystem navigation, diff review, small manual edits, and git surface**, the agent writes the bulk of code, but Neovim is the surgical tool.
 
 ## Modes (the one concept you have to internalize)
 
@@ -54,19 +54,19 @@ Type that in a terminal. It's a built-in 30-minute interactive tutorial that com
 
 `.` is the most underrated key on the keyboard. It repeats the last edit.
 
-## Our config — what's installed
+## Our config: what's installed
 
-- **[lazy.nvim](https://lazy.folke.io)** — plugin manager. Bootstraps itself on first run.
-- **[oil.nvim](https://github.com/stevearc/oil.nvim)** — edit the filesystem like a buffer.
-- **[neogit](https://github.com/NeogitOrg/neogit)** — Magit-style git UI.
-- **[snacks.nvim](https://github.com/folke/snacks.nvim)** — folke's collection: picker, dashboard, notifier, indent guides, statuscolumn.
+- **[lazy.nvim](https://lazy.folke.io)**: plugin manager. Bootstraps itself on first run.
+- **[oil.nvim](https://github.com/stevearc/oil.nvim)**: edit the filesystem like a buffer.
+- **[neogit](https://github.com/NeogitOrg/neogit)**: Magit-style git UI.
+- **[snacks.nvim](https://github.com/folke/snacks.nvim)**: folke's collection: picker, dashboard, notifier, indent guides, statuscolumn.
 
 Leader key is **space**. So `<leader>ff` means "press space, then f, then f".
 
 ## First-run checklist
 
 1. Open Neovim: `nvim`
-2. **lazy.nvim will bootstrap** — clones itself, installs the 4 plugins listed above. Watch the progress; hit `q` when done.
+2. **lazy.nvim will bootstrap**, clones itself, installs the 4 plugins listed above. Watch the progress; hit `q` when done.
 3. Quit and reopen. Now the plugins are loaded.
 
 ## Config keybinds (from `~/.config/nvim/lua/plugins/*.lua`)
@@ -95,7 +95,7 @@ Oil's magic: the filesystem is a **buffer**. Renaming = editing text. Deleting a
 | Help pages | `<space>fh` |
 | Keymaps | `<space>fk` |
 
-`<space>fk` is the "I forgot a keybind" escape hatch — search all defined keybinds by description.
+`<space>fk` is the "I forgot a keybind" escape hatch, search all defined keybinds by description.
 
 ### Git (neogit)
 
@@ -112,22 +112,22 @@ Inside neogit: `s` to stage, `u` to unstage, `x` to discard, `cc` to commit, `?`
 
 **Best resources for you specifically** (since you don't have prior Neovim config):
 
-1. **[Luke Smith — Vimtutor Let's Play](https://www.youtube.com/watch?v=d8XtNXutVto)** — do this alongside `vimtutor`
-2. **[ThePrimeagen — 0 to LSP: Neovim RC From Scratch](https://www.youtube.com/watch?v=w7i4amO_zaE)** — build a config from nothing
-3. **[TJ DeVries — Effective Neovim: Instant IDE](https://www.youtube.com/watch?v=stqUbv-5u2s)** — kickstart.nvim walkthrough from a Neovim core maintainer
-4. **[Josean Martinez — How I Setup Neovim On My Mac](https://www.youtube.com/watch?v=vdn_pKJUda8)** — 1hr full setup with LSP
-5. **[Neovim Lua guide](https://neovim.io/doc/user/lua-guide.html)** — official, dense but authoritative
+1. [Luke Smith: Vimtutor Let's Play](https://www.youtube.com/watch?v=d8XtNXutVto). Do this alongside `vimtutor`.
+2. [ThePrimeagen: 0 to LSP, Neovim RC From Scratch](https://www.youtube.com/watch?v=w7i4amO_zaE). Build a config from nothing.
+3. [TJ DeVries: Effective Neovim, Instant IDE](https://www.youtube.com/watch?v=stqUbv-5u2s). `kickstart.nvim` walkthrough from a Neovim core maintainer.
+4. [Josean Martinez: How I Setup Neovim On My Mac](https://www.youtube.com/watch?v=vdn_pKJUda8). 1hr full setup with LSP.
+5. [Neovim Lua guide](https://neovim.io/doc/user/lua-guide.html). Official, dense but authoritative.
 
 See `docs/RESOURCES.md` for the full index.
 
 ## Learning path (4 hours to competent)
 
-1. **30 min** — run `vimtutor` end to end. Do not skip.
-2. **~1 hour** — ThePrimeagen "0 to LSP" video above
-3. **1 hour** — open your own project in nvim, use `<space>ff` to jump around, `<space>fg` to grep. Force yourself.
-4. **30 min** — try oil.nvim: press `-`, navigate to a random directory, rename a file by editing the buffer, `:w`
-5. **30 min** — try neogit: `<space>gg` inside a repo, stage/commit a change
-6. **1 hour** — customize one thing. Add a keybind. Break something. Fix it.
+1. **30 min**, run `vimtutor` end to end. Do not skip.
+2. **~1 hour**, ThePrimeagen "0 to LSP" video above
+3. **1 hour**, open your own project in nvim, use `<space>ff` to jump around, `<space>fg` to grep. Force yourself.
+4. **30 min**, try oil.nvim: press `-`, navigate to a random directory, rename a file by editing the buffer, `:w`
+5. **30 min**, try neogit: `<space>gg` inside a repo, stage/commit a change
+6. **1 hour**, customize one thing. Add a keybind. Break something. Fix it.
 
 After ~2 weeks of daily use, motions become muscle memory. That's the payoff.
 

@@ -6,9 +6,9 @@ tmux is the **load-bearing primitive** of Kun's workflow. Every shell you open l
 
 ```
 tmux server (background process)
- └── session (a named collection of windows — usually "main")
-      └── window (like a browser tab — has a name, contains panes)
-           └── pane (a single shell — split horizontally or vertically)
+ └── session (a named collection of windows, usually "main")
+ └── window (like a browser tab, has a name, contains panes)
+ └── pane (a single shell, split horizontally or vertically)
 ```
 
 - **Server**: one background daemon; you rarely think about it.
@@ -22,7 +22,7 @@ Every tmux keybind starts with the **prefix key** to distinguish it from stuff s
 
 Every command below is: `press C-a, release, then press the next key`. Notation: `C-a d` means "control-a then d".
 
-## Absolute essentials — memorize these first
+## Absolute essentials: memorize these first
 
 | Do this | Press |
 |---|---|
@@ -42,7 +42,7 @@ Every command below is: `press C-a, release, then press the next key`. Notation:
 | Reload config | `C-a r` |
 | Zoom current pane fullscreen (toggle) | `C-a z` |
 
-## Copy mode (scroll back, copy text)
+## Copy mode (scroll back: copy text)
 
 Terminal doesn't scroll normally inside tmux. Enter **copy mode** instead:
 
@@ -56,12 +56,12 @@ Terminal doesn't scroll normally inside tmux. Enter **copy mode** instead:
 
 Mouse also works (`set -g mouse on` in our config), so you can also just scroll and click-drag.
 
-## Persistence — the killer feature
+## Persistence: the killer feature
 
 Our config includes two plugins that make sessions survive reboots:
 
-- **tmux-resurrect** — manual save/restore: `C-a C-s` save, `C-a C-r` restore
-- **tmux-continuum** — auto-saves every 15 min, auto-restores on tmux server start (already enabled)
+- **tmux-resurrect**: manual save/restore: `C-a C-s` save, `C-a C-r` restore
+- **tmux-continuum**: auto-saves every 15 min, auto-restores on tmux server start (already enabled)
 
 **First-run**: after installing our config, press `C-a I` (capital I) once to install the plugin manager plugins. You'll see a "Installing..." message; wait a few seconds; done. Only needed once.
 
@@ -70,21 +70,21 @@ Our config includes two plugins that make sessions survive reboots:
 Kun runs a session per project:
 
 ```bash
-tmux new -s myproject      # from a fresh shell (or C-a : new-session)
+tmux new -s myproject # from a fresh shell (or C-a : new-session)
 # do work; C-a d to detach
-tmux new -s another        # new project
-tmux ls                    # list all sessions
-tmux attach -t myproject   # attach to specific
+tmux new -s another # new project
+tmux ls # list all sessions
+tmux attach -t myproject # attach to specific
 ```
 
 Our zsh auto-attaches to `main` on shell open. To switch to a different session inside tmux: `C-a s` shows a session picker.
 
 ## Sending commands to panes from outside
 
-Useful for agent workflows — send text to a specific pane programmatically:
+Useful for agent workflows, send text to a specific pane programmatically:
 
 ```bash
-tmux send-keys -t main:1.2 "npm test" Enter   # session:window.pane
+tmux send-keys -t main:1.2 "npm test" Enter # session:window.pane
 ```
 
 ## Cheat sheet reference
@@ -94,17 +94,17 @@ Pin this: <https://tmuxcheatsheet.com/>
 ## Learn more
 
 - Official man page: `man tmux` (the definitive reference)
-- **Dreams of Code — "Tmux has forever changed the way I write code"**: <https://www.youtube.com/watch?v=DzNmUNvnB04>
-- **HackerSploit — Complete tmux Tutorial** (longer, methodical): <https://www.youtube.com/watch?v=Yl7NFenTgIo>
-- **devaslife — dev workflow with tmux and vim**: <https://www.youtube.com/watch?v=sSOfr2MtRU8>
+- **Dreams of Code: "Tmux has forever changed the way I write code"**: <https://www.youtube.com/watch?v=DzNmUNvnB04>
+- **HackerSploit: Complete tmux Tutorial** (longer, methodical): <https://www.youtube.com/watch?v=Yl7NFenTgIo>
+- **devaslife: dev workflow with tmux and vim**: <https://www.youtube.com/watch?v=sSOfr2MtRU8>
 - See `docs/RESOURCES.md` for the full index
 
 ## Learning path (2 hours total)
 
-1. **20 min** — watch the Dreams of Code video above
-2. **30 min** — do a real work task inside tmux; force yourself to use only splits/windows, no new terminal tabs
-3. **20 min** — read the "Copy mode" section of the official man page
-4. **kill the tmux server, reboot, re-attach** — see resurrect restore your layout. This is the "oh, that's why" moment
-5. **repeat for a week** — muscle memory forms
+1. **20 min**, watch the Dreams of Code video above
+2. **30 min**, do a real work task inside tmux; force yourself to use only splits/windows, no new terminal tabs
+3. **20 min**, read the "Copy mode" section of the official man page
+4. **kill the tmux server, reboot, re-attach**, see resurrect restore your layout. This is the "oh, that's why" moment
+5. **repeat for a week**, muscle memory forms
 
 Rule of thumb from Kun: if you're opening a new terminal window instead of a new tmux pane, you're doing it wrong.
