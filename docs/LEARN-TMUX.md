@@ -182,6 +182,32 @@ The tmux `pane-border-format` calls `tmux-pane-status.sh` per pane every
 2s, reads the state file, prints a colored glyph. Outside tmux the hooks
 are silent no-ops.
 
+### Fleet indicator in the bottom status bar
+
+The pane border only shows state for panes you can currently see. When
+you're zoomed into a single pane with `C-a z`, or when you're in a
+different window entirely, borders for the hidden panes aren't rendered.
+
+To fix that, the bottom status bar (right side) shows a **session-wide
+aggregate** of Claude Code state across every pane in every window:
+
+```
+w1:●●  w2:✓  w3:⚠   main | 01:27
+```
+
+Reading:
+- `w1:●●` two panes running in window 1
+- `w2:✓` one pane done in window 2
+- `w3:⚠` one pane needs input in window 3
+
+You never have to visit those windows or unzoom to know. Any pane you
+happen to be in shows the whole session's state at a glance.
+
+Driven by `~/.claude/hooks/tmux-fleet-status.sh`, which reads all
+`~/.claude/state/pane-*.state` files, cross-references them against
+`tmux list-panes` to skip dead panes, groups by window, and returns a
+colored string. Refreshes every 2 seconds via `status-interval`.
+
 ### Secondary signal: activity indicator
 
 `monitor-activity on` in our config also flags background panes that
