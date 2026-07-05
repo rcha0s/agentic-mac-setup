@@ -58,8 +58,10 @@ if is_windows then
 end
 
 if is_macos then
-  config.window_background_opacity = 0.8
-  config.macos_window_background_blur = 50
+  -- Solid window (was 0.8 with a 50pt background blur, which made tmux's
+  -- dark status bar look washed out because 20% of the wallpaper bled
+  -- through). Solid means tmux colors render as intended.
+  config.window_background_opacity = 1.0
   config.font_size = 15.0
   config.window_frame.font_size = 13.0
   config.native_macos_fullscreen_mode = true
