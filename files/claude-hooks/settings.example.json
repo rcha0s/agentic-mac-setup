@@ -13,6 +13,11 @@
         "hooks": [
           { "type": "command", "command": "$HOME/.claude/hooks/turn-done-notify.sh", "timeout": 5 }
         ]
+      },
+      {
+        "hooks": [
+          { "type": "command", "command": "$HOME/.claude/hooks/session-reflect.sh", "timeout": 3 }
+        ]
       }
     ],
     "Notification": [

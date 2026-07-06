@@ -138,7 +138,8 @@ backup_and_link "$DOTFILES_DIR/files/.tmux.conf"       "$HOME/.tmux.conf"
 # Claude Code hooks: turn lifecycle + tmux status integration
 log "symlinking Claude Code hooks"
 for h in tmux-mark tmux-pane-status tmux-fleet-status \
-         turn-start turn-done-notify turn-attention; do
+         turn-start turn-done-notify turn-attention \
+         session-reflect; do
   backup_and_link "$DOTFILES_DIR/files/claude-hooks/${h}.sh" \
                   "$HOME/.claude/hooks/${h}.sh"
 done

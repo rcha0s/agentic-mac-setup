@@ -115,6 +115,17 @@ Items we added or extended beyond what Kun ships publicly:
 - **Formal security-review report template** for enterprise IT
   approval of third-party apps (currently populated for
   OpenSuperWhisper). See `docs/security-review/`.
+- **OPINIONS.md doctrine.** Adapted from Kun's blog post ["Everyone
+  Should Have an OPINIONS.md"][opinions-post]. A durable record of
+  the human's stated positions ("prefer AXI over MCP",
+  "immutability in shared code, mutation in local scope") that
+  complements the memory system. Every opinion has a **When to
+  revisit** line so it doesn't calcify. Lives at
+  `~/.claude/OPINIONS.md` (personal, not tracked here) and is
+  referenced from the global `AGENTS.md`. A `Stop` hook
+  (`files/claude-hooks/session-reflect.sh`) nudges the user every
+  20 sessions to run a distillation pass. Manual review only, never
+  auto-rewrite.
 
 ### Explicitly omitted from Kun's setup (and why)
 
@@ -138,9 +149,25 @@ Items we added or extended beyond what Kun ships publicly:
   on an enterprise Mac it is a very likely policy denial. mosh alone
   is installed; Tailscale left off. See [`docs/RESOURCES.md`][resources]
   "Remote access".
-- **`baby-menu`, `wheelhouse`, `gsh`, OPINIONS.md workflow.**
-  Auxiliary Kun repos and workflows that don't move the needle on
-  the core agentic loop.
+- **`baby-menu`** (macOS menu-bar app whose widgets an agent writes).
+  Skipped because the tmux status bar + fleet indicator + OS
+  notifications already cover the "at-a-glance" role.
+  **When to revisit:** if a specific dashboard widget the tmux
+  status can't show becomes valuable (e.g., real-time cost of API
+  spend, aggregated CI status across many repos).
+- **`wheelhouse`** (cross-repo IssueOps command center via GitHub
+  Actions). Skipped because it only pays off across 5+ actively
+  orchestrated repos, and the corp-managed repos I care about
+  aren't drivable from GitHub Actions anyway.
+  **When to revisit:** if I start owning multiple personal repos
+  and want to fire cross-cutting work from GitHub mobile.
+- **`gsh`** (LLM-backed generative POSIX shell). Skipped because it
+  overlaps with Claude Code itself; the round-trip cost is the same
+  order of magnitude and Claude Code is already always-on.
+  **When to revisit:** if a "cheap one-off shell command" niche
+  emerges that doesn't warrant booting Claude Code.
+
+[opinions-post]: https://blog.kunchenguid.com/p/everyone-should-have-an-opinionsmd
 
 ## Quick start
 
