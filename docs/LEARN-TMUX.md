@@ -83,6 +83,25 @@ Resizing:
   5 cells. Hold for continuous resize.
 - Mouse drag on any pane border also works (`mouse on` in our config).
 
+## Mouse behavior
+
+`mouse on` is enabled, but with two important rebinds so tmux 3.x doesn't
+strand you in copy-mode:
+
+- **Click** a pane: just focuses it. Does not enter copy-mode.
+- **Drag** to select text: yanks the selection to the macOS clipboard
+  (via `pbcopy`) and returns you to normal mode. No `q`-to-escape
+  needed.
+- **Scroll wheel** in a pane: enters copy-mode temporarily; scroll back
+  to the bottom to auto-exit.
+- **Enter** while in copy-mode: same as MouseDragEnd — copy to clipboard
+  and cancel.
+
+Default tmux 3.x behavior parks you in copy-mode after any drag, which
+makes routine clicks-to-focus feel broken. If you see that symptom
+after a fresh tmux install or on another machine, check for the
+`MouseDragEnd1Pane` and `MouseDown1Pane` binds in `files/.tmux.conf`.
+
 ## Recipes for common shapes
 
 **Two agents side by side.** One window, two panes:
