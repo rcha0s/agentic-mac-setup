@@ -42,10 +42,14 @@ setopt SHARE_HISTORY
 # [ -x /opt/workbrew/bin/brew ] && eval "$(/opt/workbrew/bin/brew shellenv)"
 
 # ---- Version managers (uncomment what you use) ----------------------------
-# pyenv
+# pyenv. Note: `pyenv virtualenv-init` installs a precmd hook that scans
+# PATH every prompt render. On systems with a large PATH (Homebrew +
+# Workbrew + Volta + jenv etc.) this measured at ~4.8s per prompt.
+# The line is deliberately omitted below. If you need auto-activation
+# of a virtualenv on cd, prefer direnv over pyenv-virtualenv-init.
+# Otherwise: `pyenv activate <name>` / `pyenv deactivate` manually.
 # if command -v pyenv >/dev/null 2>&1; then
 #   eval "$(pyenv init -)"
-#   command -v pyenv-virtualenv-init >/dev/null 2>&1 && eval "$(pyenv virtualenv-init -)"
 # fi
 
 # jenv (Java version manager)
