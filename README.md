@@ -285,6 +285,102 @@ companion repo. The reference companion is
 [`rcha0s/claude-config`][claude-config] (private; the shape is
 visible in the public README there).
 
+### Bootstrap your own doctrine layer
+
+The three files are personal by design, so we don't ship them — but
+here's how to seed them from public sources.
+
+**1. Create your private companion repo.** Any host works; the
+maintainer's uses this shape:
+
+```
+your-claude-config/
+├── AGENTS.md               # global agent behavior rules
+├── OPINIONS.md             # durable stated preferences
+├── settings.json.template  # Bedrock ARN + token placeholders
+└── install.sh              # symlinks the above into ~/.claude/
+```
+
+Keep the repo private — `settings.json` will hold live secrets and
+`OPINIONS.md` typically references internal tools, teams, and
+incidents.
+
+**2. Seed `OPINIONS.md` from Kun Chen's canonical example.** Kun's
+blog post ["Everyone Should Have an
+OPINIONS.md"][opinions-post] is the source of the pattern — read it
+before writing your own. Copy his structure (a short front-matter
+declaration; then a list of opinions each with a **When to revisit**
+line so the doctrine doesn't calcify), and populate it with your
+*own* positions. Example opening entries:
+
+```markdown
+# OPINIONS.md
+
+Durable stated preferences for how I want agents to work with me.
+Each opinion has a "When to revisit" line — no rule is permanent.
+
+## Prefer AXI CLIs over MCP servers
+
+For any operation where an AXI-style CLI exists (github, browser,
+tasks, backlog), invoke it directly rather than reaching for the
+MCP equivalent. Reason: 40% token savings + higher success rate
+per Kun Chen's published benchmarks.
+
+**When to revisit:** if an MCP starts outperforming AXI on a
+specific operation, or if a critical AXI CLI stops being maintained.
+
+## Immutability in shared code, mutation in local scope
+
+Shared modules use immutable data structures; a function that mutates
+a local variable inside its own body is fine. Bias the boundary
+toward "shared = frozen" because most bugs at this codebase come
+from unexpected mutation across module boundaries.
+
+**When to revisit:** if performance profiles show immutable-copy
+allocation is the hotspot, or if we adopt a language whose runtime
+handles this differently (e.g. Rust ownership).
+```
+
+Add your own opinions as they solidify — every correction you make
+to an agent twice is a candidate for an OPINIONS entry.
+
+**3. Seed `AGENTS.md` from public references.** Start with a fork
+of Anthropic's [Claude Code documentation
+patterns](https://docs.claude.com/en/docs/claude-code) or the
+Everything-Claude-Code plugin's [global AGENTS.md
+example](https://github.com/affaan-m/everything-claude-code) —
+whichever matches your workflow — then narrow it to your actual
+tooling. The maintainer's ~13KB `AGENTS.md` merges Kun's doctrine
+(from the [primary video][video] and his [blog][blog]) with the
+Everything-Claude-Code common rules, plus a "no-mistakes doctrine"
+section describing the validation pipeline. You don't need all of
+that on day one; strip it to what you'll actually enforce.
+
+**4. Seed `settings.json` from a template with placeholders.**
+Never commit the real thing. The maintainer's private repo tracks
+a `settings.json.template` with `${AWS_PROFILE}`, `${OPUS_PROFILE_ID}`,
+`${SOURCEGRAPH_TOKEN}` etc. — resolved by the installer only on the
+target machine. The template is visible in the
+[`rcha0s/claude-config` README][claude-config] under "Filling in the
+settings template" if you want the placeholder inventory.
+
+**5. Wire it up with a two-line installer.** Symlinks the tracked
+files into `~/.claude/` and refuses to overwrite an existing
+`settings.json`:
+
+```bash
+ln -sfn "$REPO/AGENTS.md"   ~/.claude/AGENTS.md
+ln -sfn "$REPO/OPINIONS.md" ~/.claude/OPINIONS.md
+[ -f ~/.claude/settings.json ] || cp "$REPO/settings.json.template" ~/.claude/settings.json
+```
+
+Run `install-noix.sh` from *this* repo first (it symlinks the
+generic hooks + tmux status scripts into `~/.claude/hooks/` and
+`~/.tmux-scripts/`), then run your private repo's installer to
+overlay the doctrine layer. The two never touch the same files.
+
+[blog]: https://blog.kunchenguid.com
+
 Concretely:
 
 - `files/zshrc.local.example` is the tracked public template. On first
