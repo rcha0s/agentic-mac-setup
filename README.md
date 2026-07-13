@@ -8,6 +8,11 @@ public [`axi`][axi-repo] / [`gnhf`][gnhf] / [`no-mistakes`][nomistakes]
 **enterprise-managed developer Macs** where the vanilla Nix bootstrap
 triggers MDM alerts.
 
+> **On Windows?** See the sibling repo
+> [`rcha0s/agentic-windows-setup`][win-setup] — the same stack ported
+> to Windows / WSL2 with a single PowerShell command, no Nix, and a
+> WSL→host CDP browser bridge.
+
 ### Why bother
 
 The numbers cited in Kun's [published AXI benchmarks][axi-site] are
@@ -54,6 +59,30 @@ inline (see the [References](#references) section); this repo's own
 value is the *enterprise-Mac adaptation*, the *learning docs*, and the
 *Claude-agent-to-tmux visibility bridge* — all of which we call out
 explicitly as our additions in the ["Layered on top"](#layered-on-top-our-additions) section.
+
+### When *not* to use this repo
+
+Be honest with yourself before cloning. Use **Kun's mainline
+[`kunchenguid/dotfiles-mac-nix`][dotfiles]** directly if you:
+
+- Run macOS on a personally-owned or startup-managed machine where
+  Determinate Nix's system-level activation won't trigger MDM/EDR
+- Are comfortable putting `AGENTS.md` / `OPINIONS.md` in a public
+  repo (no internal tool names, MR numbers, or vendor decisions to
+  hide)
+- Are already fluent in tmux, Neovim, and zsh — don't need the
+  ~5000 words of learning docs shipped here
+- Want the freshest version of Kun's doctrine (this fork tracks
+  upstream but lags on Kun's day-to-day improvements)
+
+Use **[`rcha0s/agentic-windows-setup`][win-setup]** if you're on
+Windows or WSL2 — same stack, different bootstrap.
+
+**Stay here** if all four apply: enterprise-managed Mac, private
+doctrine required, want Claude-aware tmux visibility across a
+multi-pane agent fleet, still building fluency with the tmux + nvim +
+zsh + agentic-CLI toolchain. That's the specific niche this fork
+serves.
 
 [bridge-section]: #claude-tmux-bridge
 
@@ -463,6 +492,7 @@ MIT (same as upstream).
 [treehouse]: https://github.com/kunchenguid/treehouse
 [firstmate]: https://github.com/kunchenguid/firstmate
 [claude-config]: https://github.com/rcha0s/claude-config
+[win-setup]: https://github.com/rcha0s/agentic-windows-setup
 [det-nix]: https://determinate.systems/nix-installer/
 [oil]: https://github.com/stevearc/oil.nvim
 [neogit]: https://github.com/NeogitOrg/neogit
