@@ -16,8 +16,18 @@
 - `~/.tmux.conf` → `files/.tmux.conf`
 - `~/.zshrc.local` → `files/zshrc.local`
 - `~/.zshrc`: has a source line at the bottom loading `.zshrc.local`
-- `~/.claude/hooks/*.sh` → `files/claude-hooks/*.sh` (6 hooks: turn
-  lifecycle + tmux status integration)
+- `~/.tmux-scripts/*.sh` → `files/tmux-scripts/*.sh` (pure-tmux display
+  readers for the pane-border and fleet-status indicators)
+- `~/.claude/hooks/*.sh` → `files/claude-hooks/*.sh` (generic Claude
+  turn-lifecycle hooks: `turn-start`, `turn-done-notify`,
+  `turn-attention`, `tmux-mark`, `session-reflect`)
+
+Personal doctrine files (`AGENTS.md`, `OPINIONS.md`, and a real
+`settings.json` with Bedrock ARNs and token pointers) are NOT in this
+repo — they contain identity-revealing content. They live in a
+separate private companion repo. See step 7 below for how to install
+them from `rcha0s/claude-config` (the maintainer's private repo used
+as reference; you'd substitute your own).
 
 **Agentic CLIs** (Volta-managed for npm, `~/.local/bin` for the two Go tools):
 - `gh-axi`, `chrome-devtools-axi`, `tasks-axi`, `lavish-axi`, `gnhf`
@@ -89,28 +99,49 @@ cd <your-repo>
 no-mistakes init
 ```
 
-### 7. Activate the Claude Code turn-lifecycle hooks
+### 7. Install personal doctrine (private companion repo)
 
-The installer symlinks the hook scripts into `~/.claude/hooks/` but does
-not modify your `~/.claude/settings.json` (which already contains
-per-user secrets and permissions we should not clobber). One-time
-manual wiring:
+The generic wiring — hooks, tmux status scripts, permission templates
+— was symlinked by `install-noix.sh` above. What's left is your
+**personal doctrine layer**:
 
-1. Open `~/.claude/settings.json` in your editor.
-2. Open `files/claude-hooks/settings.example.json` in the fork.
-3. Copy the three entries under the example's `hooks` block
-   (`UserPromptSubmit`, `Stop`, `Notification`) into your settings.json's
-   `hooks` block. If the block does not exist, add it. If there are
-   already `UserPromptSubmit` or `Stop` entries (from other tools like
-   the `auto-permissions-from-plan` skill), append rather than replace.
-4. Save and restart Claude Code.
+- `~/.claude/AGENTS.md` — global agent behavior rules
+- `~/.claude/OPINIONS.md` — durable stated preferences
+- `~/.claude/settings.json` — Bedrock ARNs, token pointers, per-user
+  permission allowlist
 
-What activates:
+These contain identity-revealing content and live in a separate
+**private** repo. The maintainer's own is `rcha0s/claude-config`;
+you'd have your own equivalent. Clone and run its idempotent
+installer:
+
+```bash
+gh repo clone rcha0s/claude-config ~/github/claude-config
+bash ~/github/claude-config/install.sh
+```
+
+That symlinks `AGENTS.md` and `OPINIONS.md` into `~/.claude/`, then —
+only if `~/.claude/settings.json` does not already exist — seeds it
+from `settings.json.template`. The template contains `${...}`
+placeholders (Bedrock inference profile ARNs, `SOURCEGRAPH_TOKEN`,
+`permissions.additionalDirectories`, `enabledMcpjsonServers`) that
+you fill in for the new machine. Real secrets never live in the
+repo; they come from Keychain / environment / whatever secret store
+you use.
+
+Also merge the hooks{} block from
+`files/claude-hooks/settings.example.json` (in the public repo) into
+your `~/.claude/settings.json` to activate the turn-lifecycle hooks.
+Once done, restart Claude Code. What activates:
+
 - Per-pane and session-wide tmux status indicators (green/gray/yellow)
 - macOS notification when a turn takes over 10 seconds
 - macOS notification when Claude wants your input mid-run
+- Every-20-sessions `OPINIONS.md` distillation nudge
 
-See `docs/LEARN-TMUX.md` "Agent status indicators" for the full picture.
+See `docs/LEARN-TMUX.md` "Agent status indicators" and the "Why the
+Claude → state-file → tmux bridge exists" section of the main README
+for the full picture.
 
 ## Where to learn each piece
 

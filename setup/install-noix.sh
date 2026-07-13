@@ -135,16 +135,36 @@ backup_and_link "$DOTFILES_DIR/files/.config/nvim"     "$HOME/.config/nvim"
 backup_and_link "$DOTFILES_DIR/files/.config/starship.toml" "$HOME/.config/starship.toml"
 backup_and_link "$DOTFILES_DIR/files/.tmux.conf"       "$HOME/.tmux.conf"
 
-# Claude Code hooks: turn lifecycle + tmux status integration
+# Claude Code turn-lifecycle hooks: write state files on Claude events
+# so tmux can render agent status. Generic + reusable — no personal data.
+# See files/claude-hooks/README-esque notes and docs/LEARN-TMUX.md.
 log "symlinking Claude Code hooks"
-for h in tmux-mark tmux-pane-status tmux-fleet-status \
-         turn-start turn-done-notify turn-attention \
-         session-reflect; do
+for h in tmux-mark turn-start turn-done-notify turn-attention session-reflect; do
   backup_and_link "$DOTFILES_DIR/files/claude-hooks/${h}.sh" \
                   "$HOME/.claude/hooks/${h}.sh"
 done
-log "  hooks-settings template: $DOTFILES_DIR/files/claude-hooks/settings.example.json"
+log "  hook-wiring template: $DOTFILES_DIR/files/claude-hooks/settings.example.json"
 log "  merge its hooks{} block into ~/.claude/settings.json to activate"
+
+# tmux display scripts: read state files under ~/.claude/state/ (written
+# by the Claude-side hooks above) and print colored tmux format strings.
+# Pure display glue, no Claude knowledge — they live in a separate dir
+# because they're invoked by tmux, not by Claude events.
+log "symlinking tmux status scripts"
+for s in pane-status fleet-status; do
+  backup_and_link "$DOTFILES_DIR/files/tmux-scripts/${s}.sh" \
+                  "$HOME/.tmux-scripts/${s}.sh"
+done
+
+# Personal user-level Claude config (AGENTS.md, OPINIONS.md,
+# settings.json.template) lives in a separate PRIVATE companion repo.
+# Optional — the above works without it — but recommended for a full setup:
+log ""
+log "AGENTS.md + OPINIONS.md + settings.json template are personal doctrine."
+log "For a personal doctrine layer, clone your own private companion repo."
+log "Example: gh repo clone rcha0s/claude-config ~/github/claude-config"
+log "         bash ~/github/claude-config/install.sh"
+log ""
 
 # zshrc.local is a personal file bootstrapped from a public template on
 # first run. Never overwrite an existing one.

@@ -2,6 +2,10 @@
 # Aggregate Claude Code state across every pane in the current tmux session.
 # Prints a per-pane indicator suitable for the tmux status bar.
 #
+# Pure tmux display glue: knows nothing about Claude. The state dir it
+# reads is populated by ~/.claude/hooks/tmux-mark.sh (sibling in
+# files/claude-hooks/) as Claude hooks fire.
+#
 # Output shape (colored via tmux #[...] escapes):
 #   1.1:●  2.1:✓  2.2:●  2.3:·  2.4:⚠
 # where W.P means "window W, pane_index P". Empty panes render as a dim `·`.

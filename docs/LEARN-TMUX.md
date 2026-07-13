@@ -187,19 +187,28 @@ most-recent transition. The **pane borders are the ground truth**.
 
 ### How it works
 
-Three Claude Code hooks under `~/.claude/hooks/`:
+Two sibling script sets in this repo, cooperating through a filesystem
+contract. The **Claude side** (`files/claude-hooks/`, symlinked into
+`~/.claude/hooks/`):
+
 - `turn-start.sh` on `UserPromptSubmit` → state = running
 - `turn-done-notify.sh` on `Stop` → state = done (also sends an OS
  notification if the turn took ≥ 10 seconds)
 - `turn-attention.sh` on `Notification` → state = attention, OS notification
 
 They call `tmux-mark.sh <state>`, which:
+
 1. Writes `~/.claude/state/pane-<PANE_ID>.state`
 2. Renames the current tmux window with the matching glyph
 
-The tmux `pane-border-format` calls `tmux-pane-status.sh` per pane every
-2s, reads the state file, prints a colored glyph. Outside tmux the hooks
-are silent no-ops.
+The **tmux side** (`files/tmux-scripts/`, symlinked into
+`~/.tmux-scripts/`) is pure display glue: `pane-border-format` calls
+`~/.tmux-scripts/pane-status.sh` per pane every `status-interval`
+seconds, reads the state file, prints a colored glyph. It knows
+nothing about Claude — swap the Claude-side hooks for another
+harness's event listeners and this layer keeps working.
+
+Outside tmux the hooks are silent no-ops.
 
 ### Fleet indicator in the bottom status bar
 
@@ -222,10 +231,11 @@ Reading:
 You never have to visit those windows or unzoom to know. Any pane you
 happen to be in shows the whole session's state at a glance.
 
-Driven by `~/.claude/hooks/tmux-fleet-status.sh`, which reads all
+Driven by `~/.tmux-scripts/fleet-status.sh`, which reads all
 `~/.claude/state/pane-*.state` files, cross-references them against
 `tmux list-panes` to skip dead panes, groups by window, and returns a
-colored string. Refreshes every 2 seconds via `status-interval`.
+colored string. Refreshes every `status-interval` seconds (5s in our
+config).
 
 ### Secondary signal: activity indicator
 

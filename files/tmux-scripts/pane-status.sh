@@ -2,8 +2,12 @@
 # Called from tmux pane-border-format via #(...). Returns a short colored
 # status string based on ~/.claude/state/pane-<id>.state.
 #
-# Usage: tmux-pane-status.sh <pane_id_without_percent>
-#   e.g. tmux-pane-status.sh 17   (for pane %17)
+# Pure tmux display glue: knows nothing about Claude. The state file it
+# reads is written by ~/.claude/hooks/tmux-mark.sh (sibling in
+# files/claude-hooks/) as Claude hooks fire.
+#
+# Usage: pane-status.sh <pane_id_without_percent>
+#   e.g. pane-status.sh 17   (for pane %17)
 #
 # Output is tmux #[fg=...] formatted so it colors correctly in a border.
 # Empty output means "no status" — border renders default.

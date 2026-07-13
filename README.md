@@ -1,15 +1,61 @@
 # agentic-mac-setup
 
-A macOS setup for agentic engineering, derived from Kun Chen's ["L8
-Principal's Agentic Engineering Workflow"][video], adapted for
-enterprise-managed developer machines and extended with per-user
-preferences.
+**A macOS environment where LLM agents write most of your code and you
+drive quality, direction, and doctrine.** Adapted from Kun Chen's
+["L8 Principal's Agentic Engineering Workflow"][video] and his
+public [`axi`][axi-repo] / [`gnhf`][gnhf] / [`no-mistakes`][nomistakes]
+/ [`treehouse`][treehouse] / [`firstmate`][firstmate] tools, tuned for
+**enterprise-managed developer Macs** where the vanilla Nix bootstrap
+triggers MDM alerts.
 
-The goal is a **reproducible, keyboard-driven environment** where
-LLM-backed agents do the bulk of code writing and the human maintains
-direction and quality. Everything below is either drawn from the video
-and Kun's public repos, added on top for our own needs, or omitted for
-a reason we call out explicitly.
+### Why bother
+
+The numbers cited in Kun's [published AXI benchmarks][axi-site] are
+the reason:
+
+- **12× cost reduction** on CI-failure triage (AXI $0.065 vs. MCP $0.758)
+- **40% token savings** from AXI's TOON output format vs. equivalent JSON
+- **100% task success rate** on 490 browser-automation runs with
+  `chrome-devtools-axi` at $0.074/task and 21.5s average duration
+- **100% task success rate** on 425 GitHub-workflow runs with `gh-axi`
+  at $0.050/task — cheaper *and* more reliable than either the vanilla
+  `gh` CLI (86% success) or the official GitHub MCP server (87%
+  success, $0.148/task)
+
+Kun Chen's insight: **CLIs designed for agents outperform MCPs and
+human-facing CLIs alike**, so long as they emit structured output the
+model can parse cheaply. This repo installs those CLIs, wires them
+into a session-persistent tmux + Neovim + WezTerm environment, and
+adds a **filesystem-bridge status system** that surfaces every running
+Claude agent's state at a glance so you never lose track of what your
+fleet is doing.
+
+### What ships here
+
+- Kun's full agentic stack (7 CLIs) with install scripts that skip the
+  Nix-based bootstrap corporate MDM will flag
+- WezTerm + tmux + Neovim + zsh configs, cross-referenced against
+  installed versions, with a persistence layer (`tmux-resurrect` +
+  `continuum`) so agent sessions survive reboots
+- Generic Claude Code turn-lifecycle hooks that render per-pane and
+  session-wide agent state directly in the tmux status bar (see the
+  [state-file bridge][bridge-section] section)
+- ~5000 words of learning docs (`docs/LEARN-*.md`, `docs/PRIMER-*.md`)
+  because getting fluent on this stack is the actual bottleneck
+- Explicit **security-review templates** for enterprise IT approval of
+  third-party tools (currently populated for OpenSuperWhisper)
+- The doctrine layer (`AGENTS.md`, `OPINIONS.md`, `settings.json`) is
+  personal to each user and lives in a **private companion repo** — the
+  maintainer's is [`rcha0s/claude-config`][claude-config] as a
+  reference shape
+
+**Nothing here is proprietary.** Everything Kun published is credited
+inline (see the [References](#references) section); this repo's own
+value is the *enterprise-Mac adaptation*, the *learning docs*, and the
+*Claude-agent-to-tmux visibility bridge* — all of which we call out
+explicitly as our additions in the ["Layered on top"](#layered-on-top-our-additions) section.
+
+[bridge-section]: #claude-tmux-bridge
 
 ## Design principles (adapted from Kun Chen)
 
@@ -86,17 +132,19 @@ a reason we call out explicitly.
 | `treehouse` | Reusable git-worktree pool for parallel agents | [kunchenguid/treehouse][treehouse] |
 | `firstmate` | Fleet supervisor: one liaison agent dispatches crewmates in worktrees, escalates only real decisions | [kunchenguid/firstmate][firstmate] |
 
-### Layered on top (our additions)
+### Layered on top (our additions) <a id="layered-on-top-our-additions"></a>
 
 Items we added or extended beyond what Kun ships publicly:
 
-- **Turn-lifecycle hooks + tmux status integration** (`files/claude-hooks/`).
-  Six shell hooks wired to Claude Code's `UserPromptSubmit`, `Stop`,
-  and `Notification` events. They rename the current tmux window with
-  a status glyph and write per-pane state files that the status bar
-  reads. Result: a color-coded pane border and a session-wide "fleet"
-  indicator that shows every agent's state at a glance. See
-  [`docs/LEARN-TMUX.md`][learn-tmux] "Agent status indicators".
+- **Turn-lifecycle hooks + tmux status integration** (`files/claude-hooks/`
+  and `files/tmux-scripts/`). Claude Code hooks wired to
+  `UserPromptSubmit`, `Stop`, and `Notification` events rename the
+  tmux window with a status glyph and write per-pane state files. The
+  tmux side reads those state files to render a color-coded pane
+  border and a session-wide "fleet" indicator showing every agent's
+  state at a glance. Both sides are generic (no personal data) and
+  ship in this repo. See [`docs/LEARN-TMUX.md`][learn-tmux] "Agent
+  status indicators" and the "Why the bridge exists" section below.
 - **macOS notification on long-running turns.** `Stop` hook plays
   `Tink` and posts a banner if the turn exceeded a threshold (default
   10 seconds; configurable via `CLAUDE_NOTIFY_THRESHOLD_SECONDS`).
@@ -117,15 +165,14 @@ Items we added or extended beyond what Kun ships publicly:
   OpenSuperWhisper). See `docs/security-review/`.
 - **OPINIONS.md doctrine.** Adapted from Kun's blog post ["Everyone
   Should Have an OPINIONS.md"][opinions-post]. A durable record of
-  the human's stated positions ("prefer AXI over MCP",
-  "immutability in shared code, mutation in local scope") that
-  complements the memory system. Every opinion has a **When to
-  revisit** line so it doesn't calcify. Lives at
-  `~/.claude/OPINIONS.md` (personal, not tracked here) and is
-  referenced from the global `AGENTS.md`. A `Stop` hook
-  (`files/claude-hooks/session-reflect.sh`) nudges the user every
-  20 sessions to run a distillation pass. Manual review only, never
-  auto-rewrite.
+  the human's stated positions ("prefer AXI over MCP", "immutability
+  in shared code, mutation in local scope") that complements the
+  memory system. Every opinion has a **When to revisit** line so it
+  doesn't calcify. The `Stop` hook that nudges you every 20 sessions
+  (`session-reflect.sh`) ships in this repo; the `OPINIONS.md`
+  content is personal and lives in your own private companion repo
+  (the maintainer's is [`rcha0s/claude-config`][claude-config]).
+  Manual review only, never auto-rewrite.
 
 ### Explicitly omitted from Kun's setup (and why)
 
@@ -199,7 +246,8 @@ agentic-mac-setup/
 │   ├── .config/starship.toml
 │   ├── .tmux.conf                   # C-a prefix, vi mode, resurrect + continuum, mouse rebinds
 │   ├── zshrc.local.example          # personal shell config template (tracked)
-│   ├── claude-hooks/                # turn-lifecycle + tmux status hooks
+│   ├── claude-hooks/                # generic Claude turn-lifecycle hooks (event listeners + bridge)
+│   ├── tmux-scripts/                # pure-tmux status readers (see bridge note below)
 │   └── zshrc.local                  # per-machine local (git-ignored)
 ├── docs/
 │   ├── PRIMER-TMUX.md               # conceptual model + config walkthrough
@@ -221,6 +269,24 @@ agentic-mac-setup/
 
 ## Personal vs. shared config
 
+Everything under this repo is **shareable and reusable** — a stranger
+can fork it and get a working setup. That includes the Claude
+turn-lifecycle hook scripts under `files/claude-hooks/`: they contain
+no personal data, only generic wiring (write a state file when a
+turn ends, rename a tmux window with a glyph). Fork it, install it,
+it works.
+
+The maintainer's own **personal doctrine layer** — `~/.claude/AGENTS.md`,
+`~/.claude/OPINIONS.md`, and `~/.claude/settings.json` with real
+Bedrock ARNs and token pointers — lives in a separate private repo
+so its *content* doesn't leak. Anyone recreating this setup would
+similarly keep their own doctrine files in their own private
+companion repo. The reference companion is
+[`rcha0s/claude-config`][claude-config] (private; the shape is
+visible in the public README there).
+
+Concretely:
+
 - `files/zshrc.local.example` is the tracked public template. On first
   run, `install-noix.sh` copies it to `files/zshrc.local` (git-ignored)
   where you put `JAVA_HOME`, corp CA cert paths, work AWS profile
@@ -229,6 +295,31 @@ agentic-mac-setup/
   applied to any Claude Code session started in the repo. Machine-
   specific one-off approvals land in `.claude/settings.local.json`
   (git-ignored).
+
+### Why the Claude → state-file → tmux bridge exists <a id="claude-tmux-bridge"></a>
+
+Two sibling directories cooperate through a filesystem contract:
+
+| Layer | Directory | Files | Trigger |
+|---|---|---|---|
+| **Event listeners** (Claude → filesystem) | `files/claude-hooks/` | `turn-start.sh`, `turn-done-notify.sh`, `turn-attention.sh`, `session-reflect.sh` | Claude Code `UserPromptSubmit` / `Stop` / `Notification` hooks |
+| **Bridge** (rename window, write state) | `files/claude-hooks/` | `tmux-mark.sh` | Called by the event listeners above |
+| **Display readers** (state → tmux format) | `files/tmux-scripts/` | `pane-status.sh`, `fleet-status.sh` | tmux `pane-border-format` and `status-right`, polled every `status-interval` seconds |
+
+The event listeners fire on Claude events and call `tmux-mark.sh`,
+which writes `~/.claude/state/pane-<id>.state`. The tmux display
+readers, invoked by tmux itself via `#(...)`, poll those state files
+and print colored format strings. Neither side imports or exec's the
+other — they only share the state-directory contract.
+
+Why not just tmux config? Because tmux has no way to observe "Claude
+just finished a turn." Only Claude's `Stop` hook knows that. Why
+two directories instead of one? Because the tmux-side scripts are
+invoked by tmux with different lifecycle, arg conventions, and output
+format expectations than the Claude-side hooks. Colocating them
+would blur what invokes what. This split lets you swap either half
+(different harness on the Claude side; different terminal multiplexer
+on the display side) without touching the other.
 
 ## References
 
@@ -275,6 +366,7 @@ MIT (same as upstream).
 [nomistakes]: https://kunchenguid.github.io/no-mistakes/
 [treehouse]: https://github.com/kunchenguid/treehouse
 [firstmate]: https://github.com/kunchenguid/firstmate
+[claude-config]: https://github.com/rcha0s/claude-config
 [det-nix]: https://determinate.systems/nix-installer/
 [oil]: https://github.com/stevearc/oil.nvim
 [neogit]: https://github.com/NeogitOrg/neogit

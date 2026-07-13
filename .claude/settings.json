@@ -1,32 +1,15 @@
 {
-  "_comment": "Repo-scoped Claude Code permissions. Merged into every session started with cwd inside this repo. Keep this narrow: only permissions specifically useful for working with this fork (installer runs, agentic-stack CLI probes, hook script execution).",
+  "_comment": "Repo-scoped Claude Code permissions. Merged into every session started with cwd inside this repo. Keep this narrow: only permissions specifically useful for working with this fork (installer runs, repo-relative test/build commands). Global CLIs (gh-axi, tasks-axi, chrome-devtools-axi, treehouse, no-mistakes, tmux, ~/.tmux-scripts) are allowlisted in ~/.claude/settings.json.",
   "permissions": {
     "allow": [
       "Bash(bash setup/install-noix.sh)",
       "Bash(bash setup/install-noix.sh:*)",
       "Bash(DRY_RUN=1 bash setup/install-noix.sh)",
       "Bash(chmod +x setup/*.sh)",
-      "Bash(chmod +x files/claude-hooks/*.sh)",
-      "Bash(gh-axi)",
-      "Bash(gh-axi --help)",
-      "Bash(gh-axi issue *)",
-      "Bash(gh-axi pr *)",
-      "Bash(gh-axi run *)",
-      "Bash(gh-axi setup *)",
-      "Bash(chrome-devtools-axi)",
-      "Bash(chrome-devtools-axi --help)",
-      "Bash(chrome-devtools-axi setup *)",
-      "Bash(chrome-devtools-axi open *)",
-      "Bash(tasks-axi)",
-      "Bash(tasks-axi --help)",
-      "Bash(tasks-axi setup *)",
-      "Bash(tasks-axi list)",
-      "Bash(tasks-axi ready)",
-      "Bash(treehouse --help)",
-      "Bash(treehouse status)",
-      "Bash(no-mistakes --help)",
-      "Bash(~/.claude/hooks/tmux-fleet-status.sh)",
-      "Bash(~/.claude/hooks/tmux-pane-status.sh:*)"
+      "Bash(chmod +x files/tmux-scripts/*.sh)",
+      "Bash(bash tests/mac_setup_test.sh)",
+      "Bash(bash tests/*.sh)",
+      "Bash(bash -n *)"
     ]
   }
 }
