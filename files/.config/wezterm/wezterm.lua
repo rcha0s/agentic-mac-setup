@@ -51,6 +51,45 @@ wezterm.on("update-right-status", function(window)
   window:set_right_status("")
 end)
 
+-- Dim unfocused windows so the focused one is obvious at a glance. Adapted
+-- from Kun Chen's kunchenguid/dotfiles (commit 7857db1). Only matters when
+-- >1 WezTerm window is open; single-window + tmux users see no effect.
+--
+-- The identity-comparison of get_config_overrides() is load-bearing: that
+-- API hands back a COPY, so `==` on the returned table is never equal to
+-- what we last stored — comparing fields prevents an infinite reload loop.
+local UNFOCUSED_FOREGROUND_TEXT_HSB = { hue = 1.0, saturation = 0.25, brightness = 0.45 }
+local UNFOCUSED_WINDOW_BACKGROUND_OPACITY = 0.62
+
+local function same_text_hsb(actual, expected)
+  if actual == nil or expected == nil then
+    return actual == expected
+  end
+  return actual.hue == expected.hue
+    and actual.saturation == expected.saturation
+    and actual.brightness == expected.brightness
+end
+
+wezterm.on("window-focus-changed", function(window)
+  local overrides = window:get_config_overrides() or {}
+  local text_hsb, opacity
+  if not window:is_focused() then
+    text_hsb = UNFOCUSED_FOREGROUND_TEXT_HSB
+    opacity = UNFOCUSED_WINDOW_BACKGROUND_OPACITY
+  end
+
+  -- Skip the write if nothing we own has actually changed; a redundant
+  -- set_config_overrides() call triggers another config reload.
+  if same_text_hsb(overrides.foreground_text_hsb, text_hsb)
+    and overrides.window_background_opacity == opacity then
+    return
+  end
+
+  overrides.foreground_text_hsb = text_hsb
+  overrides.window_background_opacity = opacity
+  window:set_config_overrides(overrides)
+end)
+
 if is_windows then
   config.win32_system_backdrop = "Acrylic"
   config.window_background_opacity = 0.7

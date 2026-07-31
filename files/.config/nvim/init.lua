@@ -1,35 +1,15 @@
--- Neovim entry point. Kun's stated stack: oil.nvim for filesystem, neogit for
--- git, snacks.nvim for pickers/dashboard/notifier. Heavy lifting lives in
--- those plugins; init.lua stays minimal.
+-- Neovim entry point. Bootstrap only — see:
+--   lua/options.lua  (vim.opt.*)
+--   lua/keys.lua     (non-plugin keymaps)
+--   lua/plugins/*    (plugin specs; lazy.nvim discovers them)
+--
+-- Kun's stated stack: oil.nvim for filesystem, neogit for git,
+-- snacks.nvim for pickers/dashboard/notifier.
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-local opt = vim.opt
-opt.number = true
-opt.relativenumber = true
-opt.signcolumn = "yes"
-opt.termguicolors = true
-opt.undofile = true
-opt.expandtab = true
-opt.shiftwidth = 2
-opt.tabstop = 2
-opt.smartindent = true
-opt.ignorecase = true
-opt.smartcase = true
-opt.splitright = true
-opt.splitbelow = true
-opt.scrolloff = 8
-opt.updatetime = 200
-opt.timeoutlen = 400
-opt.clipboard = "unnamedplus"
-opt.mouse = "a"
-opt.wrap = false
-opt.cursorline = true              -- highlight the current line
-opt.cursorlineopt = "number,line"  -- highlight number column + line body
--- Make the block cursor visible on top of dark plugin backgrounds (Neogit,
--- oil, snacks). Vertical bar in insert mode; block elsewhere; blink on.
-opt.guicursor = "n-v-c-sm:block-blinkwait700-blinkoff400-blinkon250,i-ci-ve:ver25,r-cr-o:hor20"
+require("options")
 
 -- lazy.nvim bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -63,3 +43,7 @@ require("lazy").setup({
     },
   },
 })
+
+-- Non-plugin keymaps last so any keymap our plugins define first can be
+-- overridden here if we ever need to.
+require("keys")

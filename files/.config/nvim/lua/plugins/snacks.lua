@@ -26,6 +26,9 @@ return {
       { "<leader>fh", function() Snacks.picker.help() end, desc = "Help Pages" },
       { "<leader>fk", function() Snacks.picker.keymaps() end, desc = "Keymaps" },
       { "<leader>n",  function() Snacks.notifier.show_history() end, desc = "Notification History" },
+      -- LSP bridge. Uses the Snacks picker for a consistent UI when an LSP
+      -- is attached; falls back silently if no LSP is running.
+      { "gd", function() Snacks.picker.lsp_definitions() end, desc = "Goto Definition (LSP)" },
     },
   },
 }

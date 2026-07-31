@@ -18,6 +18,15 @@ return {
     config = function(_, opts)
       require("rose-pine").setup(opts)
       vim.cmd.colorscheme("rose-pine")
+
+      -- Snacks picker's directory column defaults to a foreground color that
+      -- is nearly invisible on rose-pine moon. Nudge it toward the palette's
+      -- "subtle" foreground so file paths are readable in fzf-style pickers.
+      -- Fix adapted from Kun Chen's dotfiles config.
+      local ok, palette = pcall(require, "rose-pine.palette")
+      if ok then
+        vim.api.nvim_set_hl(0, "SnacksPickerDir", { fg = palette.subtle })
+      end
     end,
   },
 }
