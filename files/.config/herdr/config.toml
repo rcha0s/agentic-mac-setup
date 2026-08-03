@@ -1,0 +1,34 @@
+# Herdr multiplexer config. Adapted from Kun Chen's kunchenguid/dotfiles.
+#
+# Herdr runs in PARALLEL to tmux in this setup — the WezTerm default is
+# still tmux auto-attach (see files/zshrc.local.example). Herdr is opened
+# in dedicated WezTerm windows via a keybind that sets SKIP_TMUX=1.
+#
+# Key layout mimics tmux (ctrl+b prefix, hjkl nav, " and % splits) so
+# muscle memory transfers. Herdr's copy-mode internal keys (v/space to
+# select, y/Enter to copy, q/Esc to cancel) aren't user-configurable.
+
+[keys]
+prefix = "ctrl+b"
+
+focus_pane_left  = "prefix+h"
+focus_pane_down  = "prefix+j"
+focus_pane_up    = "prefix+k"
+focus_pane_right = "prefix+l"
+
+split_horizontal = "prefix+double_quote"
+split_vertical   = "prefix+percent"
+
+new_tab   = "prefix+c"
+close_tab = "prefix+ampersand"
+
+workspace_picker = "prefix+w"
+goto             = "prefix+g"
+
+copy_mode = "prefix+y"
+
+[ui]
+# "spaces" groups agents by workspace (the default); "priority" is an
+# alternative Herdr offers. Keep "spaces" explicit so a future default
+# flip doesn't silently reorder our panel.
+agent_panel_sort = "spaces"

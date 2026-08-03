@@ -106,4 +106,18 @@ if is_macos then
   config.native_macos_fullscreen_mode = true
 end
 
+-- Keybind: CMD+Shift+H opens a new WezTerm window that skips the tmux
+-- auto-attach in zshrc.local (SKIP_TMUX=1) and launches herdr instead.
+-- This is the "parallel coexistence" pattern: default windows go to tmux,
+-- one keybind gives you herdr on demand without breaking the fleet-status
+-- workflow. Removing this keybind fully reverts the setup.
+config.keys = config.keys or {}
+table.insert(config.keys, {
+  key = "H",
+  mods = "CMD|SHIFT",
+  action = wezterm.action.SpawnCommandInNewWindow({
+    args = { "/bin/zsh", "-l", "-c", "SKIP_TMUX=1 exec herdr" },
+  }),
+})
+
 return config
