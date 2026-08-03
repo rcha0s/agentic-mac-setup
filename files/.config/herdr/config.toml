@@ -1,8 +1,9 @@
 # Herdr multiplexer config. Adapted from Kun Chen's kunchenguid/dotfiles.
 #
-# Herdr runs in PARALLEL to tmux in this setup — the WezTerm default is
-# still tmux auto-attach (see files/zshrc.local.example). Herdr is opened
-# in dedicated WezTerm windows via a keybind that sets SKIP_TMUX=1.
+# Herdr coexists with tmux in this setup: tmux is now opt-in (interactive
+# shells stay in plain zsh by default; set AUTO_ATTACH_TMUX=1 to restore
+# the always-attach behavior). Herdr is launched directly via WezTerm's
+# CMD+Shift+H keybind (see files/.config/wezterm/wezterm.lua).
 #
 # Key layout mimics tmux (ctrl+b prefix, hjkl nav, " and % splits) so
 # muscle memory transfers. Herdr's copy-mode internal keys (v/space to

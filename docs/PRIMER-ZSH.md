@@ -122,7 +122,7 @@ The `claude` function is the most important, it walks up from `$PWD` finding the
 - zsh-autosuggestions + zsh-syntax-highlighting sourced from Homebrew paths
 - `^f` (Ctrl-F) accepts the current autosuggestion
 - starship prompt init
-- tmux auto-attach on interactive shell start
+- tmux auto-attach on interactive shell start (opt-in; set `AUTO_ATTACH_TMUX=1` to enable — plain zsh is the default so `herdr`, tmux, and no-multiplexer flows are all first-class)
 
 ## The three plugins worth installing
 

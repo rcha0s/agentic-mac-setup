@@ -132,12 +132,14 @@ fi
 # ---- ~/.local/bin (no-mistakes, treehouse install here) ------------------
 export PATH="$HOME/.local/bin:$PATH"
 
-# ---- tmux auto-attach ----------------------------------------------------
-# Kun-style: every interactive shell lives inside tmux `main`.
-# Skip for VS Code integrated terminal and non-interactive shells.
-# Set SKIP_TMUX=1 to open a shell without auto-attaching — used for herdr
-# windows and other alternative-multiplexer flows. Once inside a
-# SKIP_TMUX shell, run `herdr` or plain zsh commands directly.
-if [[ -o interactive ]] && [[ -z "$TMUX" ]] && [[ -z "$INSIDE_EMACS" ]] && [[ -z "$VSCODE_PID" ]] && [[ -z "$SKIP_TMUX" ]] && command -v tmux >/dev/null 2>&1; then
+# ---- tmux auto-attach (opt-in) -------------------------------------------
+# Default: interactive shells stay in plain zsh. Reattach to tmux on
+# demand (`tmux new -A -s main`). This lets herdr, plain shells, and
+# tmux each be first-class instead of one always winning.
+#
+# The old Kun-style always-attach behavior is available on demand:
+# set AUTO_ATTACH_TMUX=1 in your environment (e.g. WezTerm env, or a
+# per-shell function) to restore it.
+if [[ -o interactive ]] && [[ -z "$TMUX" ]] && [[ -z "$INSIDE_EMACS" ]] && [[ -z "$VSCODE_PID" ]] && [[ -n "$AUTO_ATTACH_TMUX" ]] && command -v tmux >/dev/null 2>&1; then
   exec tmux new-session -A -s main
 fi
