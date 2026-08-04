@@ -17,16 +17,16 @@ focus_pane_down  = "prefix+j"
 focus_pane_up    = "prefix+k"
 focus_pane_right = "prefix+l"
 
-split_horizontal = "prefix+double_quote"
-split_vertical   = "prefix+percent"
+split_horizontal = "prefix+_"
+split_vertical   = "prefix+|"
 
-new_tab   = "prefix+c"
-close_tab = "prefix+ampersand"
+new_tab   = "prefix+n"
+close_tab = "prefix+/"
 
 workspace_picker = "prefix+w"
 goto             = "prefix+g"
 
-copy_mode = "prefix+y"
+copy_mode = "prefix+c"
 
 [ui]
 # "spaces" groups agents by workspace (the default); "priority" is an
