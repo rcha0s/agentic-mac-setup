@@ -5,12 +5,13 @@
 # the always-attach behavior). Herdr is launched directly via WezTerm's
 # CMD+Shift+H keybind (see files/.config/wezterm/wezterm.lua).
 #
-# Key layout mimics tmux (ctrl+b prefix, hjkl nav, " and % splits) so
-# muscle memory transfers. Herdr's copy-mode internal keys (v/space to
-# select, y/Enter to copy, q/Esc to cancel) aren't user-configurable.
+# Key layout mimics our tmux config (ctrl+a prefix, hjkl nav) so
+# muscle memory transfers between them. Herdr's copy-mode internal
+# keys (v/space to select, y/Enter to copy, q/Esc to cancel) aren't
+# user-configurable.
 
 [keys]
-prefix = "ctrl+b"
+prefix = "ctrl+a"
 
 focus_pane_left  = "prefix+h"
 focus_pane_down  = "prefix+j"
