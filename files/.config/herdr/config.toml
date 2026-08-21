@@ -1,3 +1,4 @@
+onboarding = false
 # Herdr multiplexer config. Adapted from Kun Chen's kunchenguid/dotfiles.
 #
 # Herdr coexists with tmux in this setup: tmux is now opt-in (interactive
@@ -34,3 +35,7 @@ copy_mode = "prefix+c"
 # alternative Herdr offers. Keep "spaces" explicit so a future default
 # flip doesn't silently reorder our panel.
 agent_panel_sort = "spaces"
+
+[theme]
+name = "gruvbox"
+auto_switch = false
