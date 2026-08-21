@@ -2,11 +2,16 @@
 
 **A macOS environment where LLM agents write most of your code and you
 drive quality, direction, and doctrine.** Adapted from Kun Chen's
-["L8 Principal's Agentic Engineering Workflow"][video] and his
-public [`axi`][axi-repo] / [`gnhf`][gnhf] / [`no-mistakes`][nomistakes]
-/ [`treehouse`][treehouse] / [`firstmate`][firstmate] tools, tuned for
-**enterprise-managed developer Macs** where the vanilla Nix bootstrap
-triggers MDM alerts.
+["L8 Principal's Agentic Engineering Workflow"][video] and his public
+tools, extended with Matt Pocock's [skills][mattpocock-skills], and
+tuned for **enterprise-managed developer Macs** where the vanilla Nix
+bootstrap triggers MDM alerts.
+
+In daily practice: herdr as the primary multiplexer, Matt Pocock's
+grilling skills (`/matt-grill-with-docs`, `/matt-grill-me`) to
+crystallize requirements before writing a line of code, and Kun Chen's
+`OPINIONS.md` + `CLAUDE.md` doctrine pattern to keep agent behavior
+consistent across sessions and machines.
 
 > **On Windows?** See the sibling repo
 > [`rcha0s/agentic-windows-setup`][win-setup] — the same stack ported
@@ -30,29 +35,35 @@ the reason:
 Kun Chen's insight: **CLIs designed for agents outperform MCPs and
 human-facing CLIs alike**, so long as they emit structured output the
 model can parse cheaply. This repo installs those CLIs, wires them
-into a session-persistent tmux + Neovim + WezTerm environment, and
-adds a **filesystem-bridge status system** that surfaces every running
-Claude agent's state at a glance so you never lose track of what your
-fleet is doing.
+into a herdr + Neovim environment, and adds a **filesystem-bridge
+status system** that surfaces every running Claude agent's state at a
+glance so you never lose track of what your fleet is doing.
 
 ### What ships here
 
 - Kun's full agentic stack (7 CLIs) with install scripts that skip the
   Nix-based bootstrap corporate MDM will flag
-- WezTerm + tmux + Neovim + zsh configs, cross-referenced against
-  installed versions, with a persistence layer (`tmux-resurrect` +
-  `continuum`) so agent sessions survive reboots
-- Generic Claude Code turn-lifecycle hooks that render per-pane and
-  session-wide agent state directly in the tmux status bar (see the
-  [state-file bridge][bridge-section] section)
+- **herdr** as the primary multiplexer (runs inside macOS Terminal.app,
+  `C-a` prefix, gruvbox theme), WezTerm as a secondary emulator, tmux
+  as opt-in (`AUTO_ATTACH_TMUX=1` restores always-attach if you prefer it)
+- Neovim + zsh configs, cross-referenced against installed versions
+- Generic Claude Code turn-lifecycle hooks and **auto-permissions hooks**
+  that reduce mid-session permission prompts
+- **12 Matt Pocock skills** vendored in the private companion repo and
+  installed as `matt-*` — in particular the grilling skills
+  (`/matt-grill-with-docs`, `/matt-grill-me`) for requirements
+  crystallization before writing code
+- **Kun Chen's `OPINIONS.md` + `CLAUDE.md` doctrine pattern** for
+  keeping agent behavior consistent across sessions; your own versions
+  live in your private companion repo
 - ~5000 words of learning docs (`docs/LEARN-*.md`, `docs/PRIMER-*.md`)
   because getting fluent on this stack is the actual bottleneck
 - Explicit **security-review templates** for enterprise IT approval of
   third-party tools (currently populated for OpenSuperWhisper)
-- The doctrine layer (`AGENTS.md`, `OPINIONS.md`, `settings.json`) is
-  personal to each user and lives in a **private companion repo** — the
-  maintainer's is [`rcha0s/claude-config`][claude-config] as a
-  reference shape
+- The full doctrine layer (`AGENTS.md`, `OPINIONS.md`, `settings.json`,
+  Matt skills) is personal to each user and lives in a **private
+  companion repo** — the maintainer's is [`rcha0s/claude-config`][claude-config]
+  as a reference shape
 
 **Nothing here is proprietary.** Everything Kun published is credited
 inline (see the [References](#references) section); this repo's own
@@ -506,6 +517,7 @@ MIT (same as upstream).
 [firstmate]: https://github.com/kunchenguid/firstmate
 [claude-config]: https://github.com/rcha0s/claude-config
 [win-setup]: https://github.com/rcha0s/agentic-windows-setup
+[mattpocock-skills]: https://github.com/mattpocock/skills
 [det-nix]: https://determinate.systems/nix-installer/
 [oil]: https://github.com/stevearc/oil.nvim
 [neogit]: https://github.com/NeogitOrg/neogit
