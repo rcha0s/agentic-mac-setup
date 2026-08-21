@@ -20,7 +20,11 @@
   readers for the pane-border and fleet-status indicators)
 - `~/.claude/hooks/*.sh` → `files/claude-hooks/*.sh` (generic Claude
   turn-lifecycle hooks: `turn-start`, `turn-done-notify`,
-  `turn-attention`, `tmux-mark`, `session-reflect`)
+  `turn-attention`, `tmux-mark`, `session-reflect`,
+  `auto-permissions-from-plan`, `auto-permissions-from-prompt`,
+  `writing-style`)
+- `~/.config/herdr/config.toml` → `files/.config/herdr/config.toml`
+  (herdr multiplexer: `C-a` prefix, gruvbox theme, onboarding off)
 
 Personal doctrine files (`AGENTS.md`, `OPINIONS.md`, and a real
 `settings.json` with Bedrock ARNs and token pointers) are NOT in this
@@ -31,7 +35,7 @@ as reference; you'd substitute your own).
 
 **Agentic CLIs** (Volta-managed for npm, `~/.local/bin` for the two Go tools):
 - `gh-axi`, `chrome-devtools-axi`, `tasks-axi`, `lavish-axi`, `gnhf`
-- `no-mistakes`, `treehouse`
+- `no-mistakes`, `treehouse`, `herdr` (brew)
 
 **Claude Code skills** (already visible in this session):
 - `gh-axi`, `chrome-devtools-axi`, `tasks-axi`, `lavish`
@@ -45,24 +49,32 @@ as reference; you'd substitute your own).
 
 ## What you still need to do manually
 
-### 1. Install WezTerm.app
+### 1. Install herdr and WezTerm
 
-Default path:
+**herdr** (primary multiplexer, runs inside macOS Terminal.app):
+```bash
+brew install herdr
+```
+Config symlink is set by `install-noix.sh`. First launch: open macOS
+Terminal.app and type `herdr`. The config at `~/.config/herdr/config.toml`
+sets `C-a` prefix and gruvbox theme with onboarding disabled.
+
+**WezTerm** (secondary emulator, kept for flexibility):
 ```bash
 brew install --cask wezterm
 ```
+If the cask is blocked by an enterprise wrapper, install directly from
+<https://wezterm.org/install/macos.html>. `CMD+Shift+H` in WezTerm opens a
+herdr window. The WezTerm config (`files/.config/wezterm/wezterm.lua`) ships
+a dim-unfocused-windows hook and rose-pine-moon colorscheme.
 
-**If your Mac uses Workbrew (or another enterprise Homebrew wrapper) and the
-cask is blocked**, either request the cask via `brew workbrew request wezterm`
-and re-run, or install directly:
-1. <https://wezterm.org/install/macos.html>
-2. Download `WezTerm-macos-*.zip`
-3. Unzip and drag `WezTerm.app` to `/Applications` (or `~/Applications/` if
-   `/Applications` is locked by MDM)
-4. Launch. It reads `~/.config/wezterm/wezterm.lua` automatically.
+**macOS Terminal.app rose-pine-moon profile** (to match the palette):
+```bash
+open files/terminal-app/RosePineMoon.terminal
+```
+Then Terminal → Settings → Profiles → select Rose Pine Moon → click Default.
 
-**Amethyst** (optional tiling window manager): `brew install --cask amethyst`,
-or download from <https://ianyh.com/amethyst/>.
+**Amethyst** (optional tiling window manager): `brew install --cask amethyst`.
 
 ### 2. Restart your shell
 
@@ -70,7 +82,9 @@ or download from <https://ianyh.com/amethyst/>.
 exec zsh
 ```
 
-You'll be inside a tmux `main` session with the new prompt.
+You'll be in a plain zsh prompt. tmux is opt-in — run `tmux new -A -s main`
+when you want it, or set `AUTO_ATTACH_TMUX=1` in your environment to restore
+auto-attach. herdr is the default multiplexer day-to-day.
 
 ### 3. Install tmux plugins (one-time)
 

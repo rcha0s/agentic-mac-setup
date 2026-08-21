@@ -78,10 +78,10 @@ Be honest with yourself before cloning. Use **Kun's mainline
 Use **[`rcha0s/agentic-windows-setup`][win-setup]** if you're on
 Windows or WSL2 — same stack, different bootstrap.
 
-**Stay here** if all four apply: enterprise-managed Mac, private
-doctrine required, want Claude-aware tmux visibility across a
-multi-pane agent fleet, still building fluency with the tmux + nvim +
-zsh + agentic-CLI toolchain. That's the specific niche this fork
+**Stay here** if these apply: enterprise-managed Mac, private
+doctrine required, want herdr as the primary multiplexer with
+tmux as the opt-in fallback, and need the auto-permissions and
+writing-style hook layer. That's the specific niche this fork
 serves.
 
 [bridge-section]: #claude-tmux-bridge
@@ -143,8 +143,9 @@ serves.
 
 | Component | Role | Config source |
 |---|---|---|
-| **WezTerm** | Terminal emulator. Frameless single window, no tabs/title/status | `files/.config/wezterm/wezterm.lua` |
-| **tmux** | Session multiplexer, load-bearing primitive. Persistent layouts survive reboots via `tmux-resurrect` + `tmux-continuum`. `C-a` prefix, vi mode-keys, mouse handling rebound to not strand you in copy-mode | `files/.tmux.conf` |
+| **herdr** | Primary terminal multiplexer. Replaces WezTerm as the daily driver — opens directly via macOS Terminal.app. `C-a` prefix (matches tmux), gruvbox theme, onboarding disabled. | `files/.config/herdr/config.toml` |
+| **WezTerm** | Still installed; used when a second emulator is useful or when testing WezTerm-specific features. `CMD+Shift+H` keybind opens a herdr window. Ships dim-unfocused-windows hook. | `files/.config/wezterm/wezterm.lua` |
+| **tmux** | Session multiplexer, opt-in (not auto-attached on shell start). Set `AUTO_ATTACH_TMUX=1` to restore always-attach behavior. `C-a` prefix, vi mode-keys. | `files/.tmux.conf` |
 | **Neovim** | Editor. [oil.nvim][oil] for filesystem-as-buffer, [neogit][neogit] for Magit-style git UI, [snacks.nvim][snacks] for pickers/dashboard/notifier, [lazy.nvim][lazy] for plugin management | `files/.config/nvim/` |
 | **zsh + starship + plugins** | Interactive shell with auto-suggestions and syntax highlighting. No Oh My Zsh (deliberate; see [PRIMER-ZSH][zsh-primer]) | `files/zshrc.local.example` |
 
@@ -202,6 +203,18 @@ Items we added or extended beyond what Kun ships publicly:
   content is personal and lives in your own private companion repo
   (the maintainer's is [`rcha0s/claude-config`][claude-config]).
   Manual review only, never auto-rewrite.
+- **Auto-permissions hooks.** Two `UserPromptSubmit` / `PreToolUse`
+  hooks (`auto-permissions-from-prompt.sh`, `auto-permissions-from-plan.sh`)
+  ship in `files/claude-hooks/`. They nudge Claude to pre-authorize
+  the narrow set of permissions each prompt or plan needs before the
+  first tool call, reducing mid-session permission dialogs. A companion
+  `writing-style.sh` hook fires when a prompt describes writing a
+  Google Doc or Confluence page and nudges Claude to load the
+  `writing-style` skill first.
+- **Matt Pocock skills** (12 vendored skills, installed via
+  `rcha0s/claude-config`). See the "Bootstrap your own doctrine layer"
+  section for how the private companion repo pulls these in as `matt-*`
+  symlinks under `~/.claude/skills/`.
 
 ### Explicitly omitted from Kun's setup (and why)
 
