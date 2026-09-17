@@ -20,7 +20,7 @@
   readers for the pane-border and fleet-status indicators)
 - `~/.claude/hooks/*.sh` → `files/claude-hooks/*.sh` (generic Claude
   turn-lifecycle hooks: `turn-start`, `turn-done-notify`,
-  `turn-attention`, `tmux-mark`, `session-reflect`,
+  `turn-attention`, `tmux-mark`, `session-reflect`, `context-hygiene-nudge`,
   `auto-permissions-from-plan`, `auto-permissions-from-prompt`,
   `writing-style`)
 - `~/.config/herdr/config.toml` → `files/.config/herdr/config.toml`

@@ -18,6 +18,11 @@
         "hooks": [
           { "type": "command", "command": "$HOME/.claude/hooks/session-reflect.sh", "timeout": 3 }
         ]
+      },
+      {
+        "hooks": [
+          { "type": "command", "command": "$HOME/.claude/hooks/context-hygiene-nudge.sh", "timeout": 3 }
+        ]
       }
     ],
     "Notification": [

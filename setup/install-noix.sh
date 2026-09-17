@@ -140,7 +140,8 @@ backup_and_link "$DOTFILES_DIR/files/.tmux.conf"       "$HOME/.tmux.conf"
 # See files/claude-hooks/README-esque notes and docs/LEARN-TMUX.md.
 log "symlinking Claude Code hooks"
 for h in tmux-mark turn-start turn-done-notify turn-attention session-reflect \
-         auto-permissions-from-plan auto-permissions-from-prompt writing-style; do
+         auto-permissions-from-plan auto-permissions-from-prompt writing-style \
+         context-hygiene-nudge; do
   backup_and_link "$DOTFILES_DIR/files/claude-hooks/${h}.sh" \
                   "$HOME/.claude/hooks/${h}.sh"
 done

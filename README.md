@@ -222,6 +222,22 @@ Items we added or extended beyond what Kun ships publicly:
   `writing-style.sh` hook fires when a prompt describes writing a
   Google Doc or Confluence page and nudges Claude to load the
   `writing-style` skill first.
+
+  **Cost tradeoff:** `auto-permissions-from-prompt.sh` fires on every
+  prompt and each firing invokes a full skill, not a flat check. In
+  practice this measured as the single largest share of one user's
+  usage (~60%). Wire `auto-permissions-from-plan.sh` (fires once per
+  approved plan) if you want the permission-fatigue win without the
+  per-prompt skill cost; treat `auto-permissions-from-prompt.sh` as
+  optional, and skip it if your harness already has its own auto-mode
+  permission classifier doing this job for free.
+- **Context-hygiene nudge.** `context-hygiene-nudge.sh` is a `Stop`
+  hook that checks the session transcript size and, once past
+  `CLAUDE_CONTEXT_NUDGE_CHARS` (default ~500k chars, ~125k tokens),
+  fires a single macOS notification suggesting `/compact` (same task)
+  or `/clear` (new task). Pure `wc -c` and a state-file marker, no
+  Skill invocation — the whole point is fixing a cost problem without
+  introducing another one.
 - **Matt Pocock skills** (12 vendored skills, installed via
   `rcha0s/claude-config`). See the "Bootstrap your own doctrine layer"
   section for how the private companion repo pulls these in as `matt-*`
@@ -451,7 +467,7 @@ Two sibling directories cooperate through a filesystem contract:
 
 | Layer | Directory | Files | Trigger |
 |---|---|---|---|
-| **Event listeners** (Claude → filesystem) | `files/claude-hooks/` | `turn-start.sh`, `turn-done-notify.sh`, `turn-attention.sh`, `session-reflect.sh` | Claude Code `UserPromptSubmit` / `Stop` / `Notification` hooks |
+| **Event listeners** (Claude → filesystem) | `files/claude-hooks/` | `turn-start.sh`, `turn-done-notify.sh`, `turn-attention.sh`, `session-reflect.sh`, `context-hygiene-nudge.sh` | Claude Code `UserPromptSubmit` / `Stop` / `Notification` hooks |
 | **Bridge** (rename window, write state) | `files/claude-hooks/` | `tmux-mark.sh` | Called by the event listeners above |
 | **Display readers** (state → tmux format) | `files/tmux-scripts/` | `pane-status.sh`, `fleet-status.sh` | tmux `pane-border-format` and `status-right`, polled every `status-interval` seconds |
 
