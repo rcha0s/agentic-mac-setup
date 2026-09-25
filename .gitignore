@@ -11,3 +11,5 @@ files/bashrc.local
 # harness). The shared allowlist is in .claude/settings.json.
 .claude/settings.local.json
 
+# Local secrets / env overrides, never committed.
+.env

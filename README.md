@@ -173,6 +173,96 @@ serves.
 | `treehouse` | Reusable git-worktree pool for parallel agents | [kunchenguid/treehouse][treehouse] |
 | `firstmate` | Fleet supervisor: one liaison agent dispatches crewmates in worktrees, escalates only real decisions | [kunchenguid/firstmate][firstmate] |
 
+### Crew runtime and local inference
+
+Two settings look similar but are independent: which session the operator
+talks to (**primary**) and which harness Firstmate launches crewmates on
+(**crew runtime**). This repo keeps them separate on purpose.
+
+| Component | Role | Config source |
+|---|---|---|
+| **Claude Code** | Primary session, the only one the operator talks to directly. Runs Opus at maximum reasoning because this session carries the strategic reasoning and the context switching. Not replaced by `pi`. | `~/.claude/` (private doctrine repo) |
+| **pi** | Crew runtime. Firstmate launches crewmate/worker sessions on `pi`; being the crew runtime does not make it the primary. | `~/.pi/agent/` |
+| **llama-server** | Serves the local model (`llama.cpp`). Stays resident until stopped, unlike Ollama, which unloads after idle. | managed by `ask-local` |
+| **ask-local** | Wrapper that starts, stops, and reports on `llama-server`. Personal tooling, like the doctrine layer (see [Bootstrap your own doctrine layer](#bootstrap-your-own-doctrine-layer)). | operator's own companion setup |
+| **`llamacpp` provider** | The only mechanism `pi` uses to reach the local model. `pi` does not honor `OPENAI_BASE_URL` or `OPENAI_API_BASE`; without this entry, requests go to the real OpenAI API instead. | `~/.pi/agent/models.json` |
+
+`setup/agentic.sh` installs `pi` (`npm install -g --ignore-scripts
+@earendil-works/pi-coding-agent`, per [pi.dev][pi-site]'s quickstart) and
+`llama-server` (`brew install llama.cpp`), then merges a `llamacpp`
+provider into `~/.pi/agent/models.json` with `jq` if it isn't already
+there:
+
+```json
+{
+  "providers": {
+    "llamacpp": {
+      "baseUrl": "http://127.0.0.1:11435/v1",
+      "apiKey": "local",
+      "api": "openai-completions",
+      "models": [
+        { "id": "local", "contextWindow": 131072, "reasoning": true, "input": ["text"] }
+      ]
+    }
+  }
+}
+```
+
+(`apiKey` is a dummy value, llama-server ignores it; `reasoning`/`input` are
+optional model metadata pi reads to decide what the model supports.)
+
+It does not fetch a GGUF file. Model weights are large, hardware-specific,
+personal-machine state, so pointing `llama-server` at your own
+`qwen-27b-q5_k_m.gguf` (`llama-server -m <path> --port 11435 -c 131072`, or
+your `ask-local` wrapper's equivalent) is on you.
+
+### Firstmate crew routing
+
+Firstmate picks its session backend from a `config/backend` file
+(containing just `herdr`) or the `FM_BACKEND=herdr` environment variable,
+inside the firstmate repo itself, not this one. That requires Herdr
+protocol 14+ from [herdr.dev][herdr-site]; see firstmate's own
+`docs/herdr-backend.md`. herdr as the backend matches herdr as the
+daily-driver multiplexer above and maps secondmates to herdr spaces.
+
+Crew dispatch by task class lives in `config/crew-dispatch.json`
+(local, gitignored, inside the firstmate repo): a list of `{when, use,
+why}` rules plus a `default`, matching the shape in firstmate's own
+`docs/examples/crew-dispatch.json`. This stack's rules:
+
+```json
+{
+  "rules": [
+    {
+      "when": "The task is a rote mechanical edit: renames, formatting sweeps, targeted typo fixes, or other narrow low-ambiguity changes.",
+      "use": { "harness": "pi", "model": "llamacpp/local" },
+      "why": "Zero marginal cost once llama-server is resident; timing does not matter for work this narrow."
+    },
+    {
+      "when": "The task is an investigation or diagnosis: root-causing a bug, tracing a regression, or otherwise figuring out what is actually true.",
+      "use": { "harness": "claude", "model": "claude-opus-5", "effort": "max" },
+      "why": "Diagnosis quality matters more than cost or latency here."
+    },
+    {
+      "when": "The task is large or risky: a multi-file feature, a risky refactor, or work that requires holding many moving parts in mind.",
+      "use": { "harness": "claude", "model": "claude-sonnet-5", "effort": "high" },
+      "why": "Enough reasoning budget for scope this size without Opus-level cost."
+    }
+  ],
+  "default": [
+    { "harness": "claude", "model": "claude-sonnet-5", "effort": "medium" }
+  ]
+}
+```
+
+Why timing doesn't matter for the local tier: a measurement had a local
+27B quant correct two wrong function bodies in 31 seconds against 4
+seconds for a smaller 26B alternative, both producing correct fixes. Only
+one local model fits in memory at a time, so the slower model was chosen
+deliberately: the operator's own `ask-local` deep path already keeps it
+resident, and routing rote crew work to that same model avoids evicting
+it and paying a reload every time either path needs it.
+
 ### Layered on top (our additions) <a id="layered-on-top-our-additions"></a>
 
 Items we added or extended beyond what Kun ships publicly:
@@ -258,7 +348,11 @@ Items we added or extended beyond what Kun ships publicly:
   already cover the same ergonomics without the shortcut collisions
   Amethyst introduces.
 - **OpenCode.** Kun uses OpenCode as his "everything except
-  Anthropic" harness. Skipped since we drive Claude Code exclusively.
+  Anthropic" harness. Skipped as a primary: Claude Code is the only
+  session the operator talks to directly. `pi` is provisioned, but only
+  as Firstmate's crew runtime for worker sessions (see
+  ["Crew runtime and local inference"](#crew-runtime-and-local-inference)),
+  never as a replacement primary.
 - **Tailscale.** Kun uses Tailscale + mosh for phone-to-Mac SSH.
   Tailscale creates a second encrypted tunnel that a corporate
   security stack cannot inspect (classic split-tunnel indicator), so
@@ -496,6 +590,13 @@ on the display side) without touching the other.
   [kunchenguid/axi][axi-repo] (with full [browser][bench-browser] and
   [GitHub][bench-github] benchmark studies)
 
+**Crew runtime and local inference**
+- pi (crew runtime): [pi.dev][pi-site] and [earendil-works/pi][pi-repo]
+- llama.cpp / llama-server: [ggml-org/llama.cpp][llamacpp-repo]
+- herdr session backend: [herdr.dev][herdr-site]
+- Firstmate configuration (backend selection, `crew-dispatch.json`):
+  [kunchenguid/firstmate docs][firstmate-config]
+
 **Research cited**
 - Ruan, S., Wobbrock, J. O., Liou, K., Ng, A., & Landay, J. A. (2016).
   Comparing Speech and Keyboard Text Entry for Short Messages in Two
@@ -525,6 +626,11 @@ MIT (same as upstream).
 [bench-github]: https://github.com/kunchenguid/axi/tree/main/bench-github
 [gh-axi]: https://github.com/kunchenguid/gh-axi
 [cd-axi]: https://github.com/kunchenguid/chrome-devtools-axi
+[pi-site]: https://pi.dev
+[pi-repo]: https://github.com/earendil-works/pi
+[llamacpp-repo]: https://github.com/ggml-org/llama.cpp
+[herdr-site]: https://herdr.dev
+[firstmate-config]: https://github.com/kunchenguid/firstmate/blob/main/docs/configuration.md
 [tasks-axi]: https://github.com/kunchenguid/tasks-axi
 [lavish]: https://github.com/kunchenguid/lavish-axi
 [gnhf]: https://github.com/kunchenguid/gnhf

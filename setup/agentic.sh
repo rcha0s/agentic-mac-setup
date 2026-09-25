@@ -6,10 +6,16 @@
 # Every step is idempotent: presence checks before install.
 #
 # Installs:
-#   - AXI skills:   gh-axi, chrome-devtools-axi, tasks-axi, lavish-axi
-#   - Orchestration: gnhf, no-mistakes, treehouse, firstmate (clone only)
+#   - AXI skills:     gh-axi, chrome-devtools-axi, tasks-axi, lavish-axi
+#   - Orchestration:  gnhf, no-mistakes, treehouse, firstmate (clone only)
+#   - Crew runtime:   pi (the harness Firstmate launches crewmate/worker
+#                      sessions on; independent of Claude Code staying primary)
+#   - Local inference: llama-server (llama.cpp) plus pi's `llamacpp` custom
+#                      provider in ~/.pi/agent/models.json. Model weights
+#                      (the GGUF file) are not downloaded here, see below.
 #
-# Prereqs (checked below): node >= 20, npm, gh, git, curl.
+# Prereqs (checked below): node >= 20, npm, gh, git, curl. jq is optional,
+# used only to merge the llamacpp provider into ~/.pi/agent/models.json.
 #
 # Skip with:  SKIP_AGENTIC=1 bash setup/mac.sh
 # Dry-run:    DRY_RUN=1 bash setup/agentic.sh
@@ -156,6 +162,73 @@ else
   run git clone https://github.com/kunchenguid/firstmate.git "$FIRSTMATE_DIR"
 fi
 
+# --- pi (crew runtime) ------------------------------------------------------
+#
+# pi is the harness Firstmate launches crewmate/worker sessions on. This is
+# independent of the primary session, which stays Claude Code (see README
+# "Crew runtime and local inference"). Install command per pi.dev's own
+# quickstart docs.
+
+if command -v pi >/dev/null 2>&1; then
+  log "pi already installed"
+else
+  log "installing pi (crew runtime): npm global, --ignore-scripts per upstream docs"
+  run npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+fi
+
+# --- Local inference layer (llama-server + pi's llamacpp provider) ---------
+#
+# llama-server (from llama.cpp) serves the local model. It stays resident
+# until stopped, unlike Ollama, which unloads after idle. pi does not honor
+# OPENAI_BASE_URL / OPENAI_API_BASE. A custom provider entry in
+# ~/.pi/agent/models.json is the only mechanism that gets pi to talk to it.
+#
+# This step does not download a GGUF file: model weights are large,
+# hardware-specific, and personal-machine state. Point llama-server at your
+# own model (e.g. via your `ask-local`-style wrapper, if you have one).
+
+LLAMACPP_ENDPOINT="${LLAMACPP_ENDPOINT:-http://127.0.0.1:11435/v1}"
+LLAMACPP_MODEL_ID="${LLAMACPP_MODEL_ID:-local}"
+LLAMACPP_CONTEXT="${LLAMACPP_CONTEXT:-131072}"
+PI_MODELS_JSON="$HOME/.pi/agent/models.json"
+
+if command -v llama-server >/dev/null 2>&1; then
+  log "llama-server already installed"
+elif command -v brew >/dev/null 2>&1; then
+  log "installing llama-server: brew install llama.cpp"
+  run brew install llama.cpp
+else
+  warn "no brew and no llama-server on PATH; install llama.cpp yourself, see docs/LEARN-AGENTIC.md"
+fi
+
+if command -v ask-local >/dev/null 2>&1; then
+  log "ask-local already installed (wrapper managing llama-server)"
+else
+  log "ask-local not found; it's personal tooling like the doctrine layer (AGENTS.md/OPINIONS.md)"
+  log "  bring your own, or drive llama-server directly, see docs/LEARN-AGENTIC.md"
+fi
+
+log "registering the llamacpp custom provider in $PI_MODELS_JSON"
+if command -v jq >/dev/null 2>&1; then
+  if [ -f "$PI_MODELS_JSON" ] && jq -e '.providers.llamacpp' "$PI_MODELS_JSON" >/dev/null 2>&1; then
+    log "  llamacpp provider already present in $PI_MODELS_JSON"
+  elif [ "$DRY_RUN" = "1" ]; then
+    printf '\033[2m  would merge llamacpp provider (%s, model "%s", context %s) into %s\033[0m\n' \
+      "$LLAMACPP_ENDPOINT" "$LLAMACPP_MODEL_ID" "$LLAMACPP_CONTEXT" "$PI_MODELS_JSON"
+  else
+    mkdir -p "$(dirname "$PI_MODELS_JSON")"
+    [ -f "$PI_MODELS_JSON" ] || printf '{"providers": {}}' > "$PI_MODELS_JSON"
+    tmp=$(mktemp)
+    jq --arg url "$LLAMACPP_ENDPOINT" --arg id "$LLAMACPP_MODEL_ID" --argjson ctx "$LLAMACPP_CONTEXT" \
+      '.providers.llamacpp = {"baseUrl": $url, "apiKey": $id, "api": "openai-completions", "models": [{"id": $id, "contextWindow": $ctx, "reasoning": true, "input": ["text"]}]}' \
+      "$PI_MODELS_JSON" > "$tmp" && mv "$tmp" "$PI_MODELS_JSON"
+    log "  wrote llamacpp provider ($LLAMACPP_ENDPOINT, model \"$LLAMACPP_MODEL_ID\", context $LLAMACPP_CONTEXT) to $PI_MODELS_JSON"
+  fi
+else
+  warn "jq not found; add the llamacpp provider to $PI_MODELS_JSON by hand:"
+  warn '  {"providers": {"llamacpp": {"baseUrl": "'"$LLAMACPP_ENDPOINT"'", "apiKey": "'"$LLAMACPP_MODEL_ID"'", "api": "openai-completions", "models": [{"id": "'"$LLAMACPP_MODEL_ID"'", "contextWindow": '"$LLAMACPP_CONTEXT"', "reasoning": true, "input": ["text"]}]}}}'
+fi
+
 # --- Claude Code hint ------------------------------------------------------
 
 CLAUDE_MD="$HOME/.claude/CLAUDE.md"
@@ -175,3 +248,5 @@ log "next steps:"
 log "  - gh auth login              (if not already authenticated)"
 log "  - cd ~/github/firstmate && claude    (opens the fleet supervisor)"
 log "  - in any repo:  no-mistakes init     (per-repo, enables git push no-mistakes)"
+log "  - point llama-server at your own qwen GGUF and start it (or wire up ask-local)"
+log "  - set config/backend and config/crew-dispatch.json in ~/github/firstmate, see README"

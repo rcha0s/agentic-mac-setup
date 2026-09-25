@@ -18,3 +18,11 @@ Run `bash tests/mac_setup_test.sh`. It simulates a fresh Mac by copying the repo
 
 Each scenario sandboxes `HOME`, re-homes `NVM_DIR` under that temp root, and unsets inherited `BASH_ENV`/`ENV` before invoking `setup/mac.sh` (an inherited absolute `NVM_DIR` from hm-session-vars would otherwise leak stub writes).
 Harness and stub writes call `assert_path_under_sandbox` / `guard_write_path` so a future leak through parent traversal, symlink escape, or another absolute write path fails the test instead of mutating the host.
+
+## setup/agentic.sh: local inference layer ships no model weights
+
+`setup/agentic.sh` provisions `pi` (npm global, the crew runtime Firstmate launches crewmate/worker sessions on, independent of Claude Code staying the primary session) and `llama-server` (`brew install llama.cpp`), then merges a `llamacpp` custom-provider entry into `~/.pi/agent/models.json` with `jq`. That provider entry is the only mechanism that gets `pi` talking to a local endpoint: `pi` ignores `OPENAI_BASE_URL` / `OPENAI_API_BASE`. The merge is idempotent (skips if the `llamacpp` key already exists) and falls back to printing the JSON block for a manual merge if `jq` is missing, matching the presence-check idiom the rest of the script uses.
+
+The script deliberately does not download or reference a specific GGUF file: model weights are large, hardware-specific, personal-machine state. Pointing `llama-server` at one is left to the operator's own `ask-local`-style wrapper, documented in `docs/LEARN-AGENTIC.md` as personal tooling (like the doctrine layer) rather than something this repo ships. Firstmate's session backend (`herdr`) and crew-dispatch routing (`config/crew-dispatch.json`) live inside the firstmate repo, not this one; this repo only documents the values this stack expects, in `README.md` ("Crew runtime and local inference", "Firstmate crew routing") and `docs/LEARN-AGENTIC.md`.
+
+Unlike `setup/mac.sh`, `setup/agentic.sh` has no dedicated test harness: its own docstring already documents it as safe to run standalone and re-run (idempotent presence checks, no system-level Nix/nix-darwin activation).

@@ -30,6 +30,11 @@ Kun Chen's agentic workflow, every tool you now have installed, when to use it, 
 └────────────────────────────────────────────────────────────────┘
 ```
 
+The captain box above is still Claude Code, that stays primary. The
+crewmates firstmate dispatches run on a separate harness, `pi`, routed
+per task class to either a local model or Claude at various reasoning
+efforts. See "pi: crew runtime" and "Firstmate configuration" below.
+
 ## The individual tools
 
 ### AXI skills (auto-loaded in Claude Code)
@@ -122,7 +127,106 @@ claude
 
 Inside, address it as "captain" and describe the work. It routes to the right project and spawns crewmates. Read `~/github/firstmate/AGENTS.md` inside the repo for the full operating manual (this is intentionally long, firstmate has real complexity).
 
+The captain session above is still Claude Code. What actually *runs*
+each crewmate is a separate setting: the crew runtime. See the next two
+sections for what that is and how firstmate decides which model each
+crewmate gets.
+
 **When to use:** you have >1 non-trivial task and want them running in parallel while you focus on one thing.
+
+### pi: crew runtime (what crewmates actually run on)
+
+`pi` ([pi.dev](https://pi.dev), [earendil-works/pi](https://github.com/earendil-works/pi)) is a separate
+coding-agent harness from Claude Code. This stack does not replace
+Claude Code with it: Claude Code stays the **primary** session, the one
+you talk to, because it carries the strategic reasoning and the context
+switching. `pi` is only the **crew runtime**: the harness firstmate
+launches crewmate/worker sessions on. Primary and crew runtime are
+independent settings; being the crew runtime doesn't make `pi` the
+primary.
+
+Install (done by `setup/agentic.sh`):
+```bash
+npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+```
+
+You won't usually invoke `pi` by hand, firstmate spawns it per crewmate
+according to `config/crew-dispatch.json` (below).
+
+### Local inference: llama-server, ask-local, and pi's `llamacpp` provider
+
+Rote crew work (renames, formatting sweeps, targeted typo fixes) routes
+to a local model instead of a hosted one, at zero marginal cost. Three
+pieces make that work:
+
+- **llama-server** (from [llama.cpp](https://github.com/ggml-org/llama.cpp), `brew install
+  llama.cpp`) serves the model. It stays resident until stopped, unlike
+  Ollama, which unloads after idle.
+- **ask-local** is the wrapper that starts, stops, and reports on
+  `llama-server`. It's personal tooling, like the doctrine layer
+  (`AGENTS.md`/`OPINIONS.md`), so it isn't shipped by this repo. Bring
+  your own, or drive `llama-server` directly.
+- **The `llamacpp` provider** in `~/.pi/agent/models.json` is the only
+  mechanism that gets `pi` talking to the local endpoint. `pi` does not
+  honor `OPENAI_BASE_URL` or `OPENAI_API_BASE`; without this entry,
+  requests go to the real OpenAI API instead:
+
+```json
+{
+  "providers": {
+    "llamacpp": {
+      "baseUrl": "http://127.0.0.1:11435/v1",
+      "apiKey": "local",
+      "api": "openai-completions",
+      "models": [
+        { "id": "local", "contextWindow": 131072, "reasoning": true, "input": ["text"] }
+      ]
+    }
+  }
+}
+```
+
+(`apiKey` is a dummy value, llama-server ignores it.)
+
+`setup/agentic.sh` merges this in with `jq` if it isn't already there.
+It does not fetch a GGUF file: model weights are large,
+hardware-specific, personal-machine state. Point `llama-server` at your
+own `qwen-27b-q5_k_m.gguf` yourself.
+
+**When to use:** any crewmate task classified as rote/mechanical by
+firstmate's dispatch rules (below). Timing genuinely doesn't matter for
+this tier: a measurement had this 27B quant correct two wrong function
+bodies in 31 seconds against 4 seconds for a smaller 26B alternative,
+both producing correct fixes. Only one local model fits in memory at a
+time, so the slower model was chosen deliberately: `ask-local`'s own
+deep-reasoning path already keeps it resident, and routing rote crew
+work to that same model avoids evicting it and paying a reload every
+time either path needs it.
+
+### Firstmate configuration: session backend and crew routing
+
+Two firstmate settings this stack relies on, both configured inside the
+firstmate repo itself, not this one:
+
+**Session backend.** A `config/backend` file (containing just `herdr`)
+or the `FM_BACKEND=herdr` environment variable selects herdr as
+firstmate's session backend instead of the `tmux` default, matching
+herdr as the daily-driver multiplexer. Requires Herdr protocol 14+ from
+[herdr.dev](https://herdr.dev); see firstmate's own `docs/herdr-backend.md`.
+
+**Crew dispatch by task class.** `config/crew-dispatch.json` (local,
+gitignored) holds `{when, use, why}` rules plus a `default`, matching
+the shape in firstmate's own `docs/examples/crew-dispatch.json`. This
+stack's four tiers:
+
+| Task class | Routed to | Why |
+|---|---|---|
+| Rote mechanical edit (rename, format sweep, typo fix) | `pi` → `llamacpp/local` | Zero marginal cost once llama-server is resident; timing doesn't matter |
+| Investigation / diagnosis | Claude, `claude-opus-5`, effort `max` | Diagnosis quality matters more than cost or latency |
+| Large or risky multi-file work | Claude, `claude-sonnet-5`, effort `high` | Enough reasoning budget for scope this size, short of Opus cost |
+| Everything else (default) | Claude, `claude-sonnet-5`, effort `medium` | Reasonable default when a task doesn't match a more specific rule |
+
+See the README's ["Firstmate crew routing"](../README.md#firstmate-crew-routing) section for the full JSON.
 
 ## Daily-driver workflow
 
@@ -176,6 +280,10 @@ Here is what a typical Kun-style day looks like:
 - no-mistakes: <https://kunchenguid.github.io/no-mistakes/>
 - treehouse: <https://github.com/kunchenguid/treehouse>
 - firstmate: <https://github.com/kunchenguid/firstmate>
+- firstmate configuration (session backend, `crew-dispatch.json`): <https://github.com/kunchenguid/firstmate/blob/main/docs/configuration.md>
+- pi (crew runtime): <https://pi.dev> and <https://github.com/earendil-works/pi>
+- llama.cpp / llama-server: <https://github.com/ggml-org/llama.cpp>
+- herdr: <https://herdr.dev>
 
 **Claude Code fundamentals:**
 
